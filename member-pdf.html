@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفاصيل العضو - PDF</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            direction: rtl;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .modal-header {
+            background: #007bff;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: white;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .member-details-container {
+            margin-bottom: 20px;
+        }
+
+        .member-basic-info h3 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .member-basic-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            border-right: 3px solid #007bff;
+        }
+
+        .info-item label {
+            font-weight: bold;
+            color: #555;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        .info-item span {
+            color: #333;
+        }
+
+        .member-images-section h3 {
+            color: #333;
+            border-bottom: 2px solid #28a745;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .image-item {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .image-item h4 {
+            color: #007bff;
+            margin: 0 0 10px 0;
+        }
+
+        .image-container {
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #1e7e34;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .image-info {
+            background: #e9ecef;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #495057;
+        }
+
+        .image-info span {
+            font-size: 14px;
+        }
+
+        .image-preview-section {
+            margin: 10px 0;
+        }
+
+        .image-preview-section h5 {
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .image-preview-container {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            background: white;
+            text-align: center;
+        }
+
+        .image-preview-container img {
+            max-width: 200px;
+            max-height: 150px;
+            border-radius: 4px;
+        }
+
+        .image-comment {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .no-image {
+            text-align: center;
+            color: #6c757d;
+            padding: 20px;
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 4px;
+        }
+
+        .no-image i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .member-folder-section,
+        .member-actions-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .member-folder-section h3 {
+            color: #333;
+            border-bottom: 2px solid #ffc107;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .folder-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .folder-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .folder-info i {
+            color: #ffc107;
+            font-size: 1.2rem;
+        }
+
+        .modal-footer {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 0 0 8px 8px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .download-controls {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .download-controls h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        /* PDF-specific styles */
+        @media print {
+            .download-controls {
+                display: none;
+            }
+            
+            .modal-content {
+                box-shadow: none;
+                margin: 0;
+                max-width: none;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        .loading i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="download-controls">
+        <h3>أدوات التحميل</h3>
+        <button class="btn btn-success" onclick="downloadMemberPDF()">
+            <i class="fas fa-download"></i> تحميل النموذج كـ PDF
+        </button>
+        <button class="btn btn-primary" onclick="downloadMemberPDFHighQuality()">
+            <i class="fas fa-download"></i> تحميل بجودة عالية
+        </button>
+    </div>
+
+    <div class="modal-content" id="memberModal">
+        <div class="modal-header">
+            <h2 id="memberModalTitle">تفاصيل العضو</h2>
+            <span class="close" onclick="window.close()">×</span>
+        </div>
+        <div class="modal-body">
+            <div id="memberDetails">
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>جاري تحميل تفاصيل العضو...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to handle image loading errors
+        function handleImageError(img, fallbackSrc) {
+            img.style.display = 'none';
+            console.log('Image failed to load:', img.src);
+        }
+
+        // Function to handle successful image loading
+        function handleImageSuccess(img, src) {
+            console.log('Image loaded successfully:', src);
+        }
+
+        // Function to create member details HTML
+        function createMemberDetailsHTML(member) {
+            // Create images array
+            const images = [];
+            for (let i = 1; i <= 11; i++) {
+                const imageUrl = member[`Image${i}`];
+                const imageBB = member[`Image${i}BB`];
+                const imageComment = member[`Image${i}Comment`];
+                
+                if (imageUrl || imageBB || imageComment) {
+                    images.push({
+                        number: i,
+                        url: imageUrl,
+                        imageBB: imageBB,
+                        comment: imageComment,
+                        hasImage: !!imageUrl,
+                        hasImageBB: !!imageBB,
+                        hasComment: !!imageComment
+                    });
+                }
+            }
+
+            return `
+                <div class="member-details-container">
+                    <div class="member-basic-info">
+                        <h3>المعلومات الأساسية</h3>
+                        <div class="member-basic-info-grid">
+                            <div class="info-item">
+                                <label>الاسم:</label>
+                                <span>${member.Name || member.NameBehind || 'غير متوفر'}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>الهاتف:</label>
+                                <span>${member.Phone || 'غير متوفر'}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>المقاس:</label>
+                                <span>${member.Size || 'غير متوفر'}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>لون السترة:</label>
+                                <span>${member.JacketColor || 'غير متوفر'}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>لون الأكمام:</label>
+                                <span>${member.SleeveColor || 'غير متوفر'}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>لون مطاط الأكمام:</label>
+                                <span>${member.SleeveRubberColor || 'غير متوفر'}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>نوع الأكمام:</label>
+                                <span>${member.SleeveType || 'غير متوفر'}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>الجيب المخفي:</label>
+                                <span>${member.HiddenPocket || 'غير متوفر'}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>البطانة الداخلية:</label>
+                                <span>${member.InnerLining || 'غير متوفر'}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>تعليق البطانة:</label>
+                                <span>${member.InnerlinningComment || 'غير متوفر'}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>تطريز البطانة:</label>
+                                <span>${member.InnerLinningTatreez || 'غير متوفر'}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>تعليق تطريز البطانة:</label>
+                                <span>${member.InnerLinningTatreezComment || 'غير متوفر'}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>القبعة الثابتة:</label>
+                                <span>${member.FixedCap || 'غير متوفر'}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>السترة كاملة الجلد:</label>
+                                <span>${member.JacketFullLeather || 'غير متوفر'}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>السعر النهائي:</label>
+                                <span>${member.FinalPrice || 'غير متوفر'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="member-images-section">
+                        <h3>الصور والتعليقات</h3>
+                        ${images.map(img => `
+                            <div class="image-item">
+                                <h4>الصورة ${img.number}</h4>
+                                <div class="image-container">
+                                    ${img.hasImage ? `
+                                        <!-- Google Drive link available but not shown in PDF -->
+                                    ` : `
+                                        <div class="no-image">
+                                            <i class="fas fa-image"></i>
+                                            <span>لا توجد صورة</span>
+                                        </div>
+                                    `}
+                                </div>
+                                ${img.hasImageBB ? `
+                                    <div class="image-preview-section">
+                                        <h5>معاينة الصورة:</h5>
+                                        <div class="image-preview-container">
+                                            <img src="${img.imageBB}" alt="معاينة صورة ${img.number}" onerror="handleImageError(this, '${img.imageBB}')" onload="handleImageSuccess(this, '${img.imageBB}')" crossorigin="anonymous">
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                <div class="image-comment">
+                                    <strong>التعليق:</strong> 
+                                    ${img.hasComment ? img.comment : 'لا يوجد تعليق'}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    ${member.InnerLinningTatreezImage ? `
+                    <div class="member-tatreez-section">
+                        <h3>صورة تطريز البطانة</h3>
+                        <div class="tatreez-image-container">
+                            <!-- Google Drive link available but not shown in PDF -->
+                        </div>
+                        ${member.InnerLinningTatreezImageBB ? `
+                            <div class="image-preview-section">
+                                <h5>معاينة صورة تطريز البطانة:</h5>
+                                <div class="image-preview-container">
+                                    <img src="${member.InnerLinningTatreezImageBB}" alt="معاينة صورة تطريز البطانة" onerror="handleImageError(this, '${member.InnerLinningTatreezImageBB}')" onload="handleImageSuccess(this, '${member.InnerLinningTatreezImageBB}')" crossorigin="anonymous">
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    ` : ''}
+                    
+
+                </div>
+            `;
+        }
+
+        // Load member data from URL parameters
+        function loadMemberData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const memberData = urlParams.get('member');
+            
+            if (memberData) {
+                try {
+                    const member = JSON.parse(decodeURIComponent(memberData));
+                    console.log('Member data loaded:', member);
+                    
+                    // Update modal title
+                    document.getElementById('memberModalTitle').textContent = `تفاصيل العضو - ${member.Name || member.NameBehind || 'غير معروف'}`;
+                    
+                    // Load member details
+                    document.getElementById('memberDetails').innerHTML = createMemberDetailsHTML(member);
+                    
+                    // Wait for images to load
+                    setTimeout(() => {
+                        const images = document.querySelectorAll('img');
+                        console.log(`Found ${images.length} images to load`);
+                    }, 1000);
+                    
+                } catch (error) {
+                    console.error('Error parsing member data:', error);
+                    document.getElementById('memberDetails').innerHTML = `
+                        <div class="loading">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>حدث خطأ في تحميل بيانات العضو</p>
+                        </div>
+                    `;
+                }
+            } else {
+                document.getElementById('memberDetails').innerHTML = `
+                    <div class="loading">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>لم يتم العثور على بيانات العضو</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Basic PDF download function (exactly like test.html)
+        async function downloadMemberPDF() {
+            try {
+                // Show loading indicator
+                const originalButton = event.target;
+                const originalText = originalButton.innerHTML;
+                originalButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل...';
+                originalButton.disabled = true;
+
+                // Get the modal element
+                const element = document.getElementById('memberModal');
+                
+                // Hide the download controls temporarily
+                const downloadControls = document.querySelector('.download-controls');
+                if (downloadControls) {
+                    downloadControls.style.display = 'none';
+                }
+
+                // Convert HTML to canvas
+                const canvas = await html2canvas(element, {
+                    scale: 2, // Higher quality
+                    useCORS: true, // Allow cross-origin images
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    width: element.scrollWidth,
+                    height: element.scrollHeight,
+                    scrollX: 0,
+                    scrollY: 0
+                });
+
+                // Show the download controls again
+                if (downloadControls) {
+                    downloadControls.style.display = 'block';
+                }
+
+                // Create PDF
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+
+                // Calculate dimensions
+                const imgWidth = 210; // A4 width in mm
+                const pageHeight = 295; // A4 height in mm
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+
+                // Add first page
+                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                // Add additional pages if content is longer than one page
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
+                // Download the PDF
+                const memberName = document.querySelector('.info-item span').textContent || 'member';
+                pdf.save(`تفاصيل_العضو_${memberName}_${new Date().toISOString().split('T')[0]}.pdf`);
+
+                // Restore button
+                originalButton.innerHTML = originalText;
+                originalButton.disabled = false;
+
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                alert('حدث خطأ أثناء إنشاء ملف PDF. يرجى المحاولة مرة أخرى.');
+                
+                // Restore button
+                const button = event.target;
+                button.innerHTML = '<i class="fas fa-download"></i> تحميل النموذج كـ PDF';
+                button.disabled = false;
+            }
+        }
+
+        // High quality PDF download function (exactly like test.html)
+        async function downloadMemberPDFHighQuality() {
+            try {
+                // Show loading indicator
+                const originalButton = event.target;
+                const originalText = originalButton.innerHTML;
+                originalButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل بجودة عالية...';
+                originalButton.disabled = true;
+
+                // Get the modal element
+                const element = document.getElementById('memberModal');
+                
+                // Hide the download controls temporarily
+                const downloadControls = document.querySelector('.download-controls');
+                if (downloadControls) {
+                    downloadControls.style.display = 'none';
+                }
+
+                // Convert HTML to canvas with higher quality
+                const canvas = await html2canvas(element, {
+                    scale: 3, // Higher quality
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    width: element.scrollWidth,
+                    height: element.scrollHeight,
+                    scrollX: 0,
+                    scrollY: 0,
+                    logging: false,
+                    imageTimeout: 15000, // Wait longer for images
+                    removeContainer: true
+                });
+
+                // Show the download controls again
+                if (downloadControls) {
+                    downloadControls.style.display = 'block';
+                }
+
+                // Create PDF with higher quality settings
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4',
+                    compress: true
+                });
+
+                // Calculate dimensions for better fit
+                const pageWidth = 210; // A4 width in mm
+                const pageHeight = 295; // A4 height in mm
+                const margin = 10; // 10mm margin
+                const imgWidth = pageWidth - (margin * 2);
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                let heightLeft = imgHeight;
+                let position = margin;
+
+                // Add first page
+                pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, position, imgWidth, imgHeight);
+                heightLeft -= (pageHeight - margin * 2);
+
+                // Add additional pages if needed
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight + margin;
+                    pdf.addPage();
+                    pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, position, imgWidth, imgHeight);
+                    heightLeft -= (pageHeight - margin * 2);
+                }
+
+                // Download the PDF
+                const memberName = document.querySelector('.info-item span').textContent || 'member';
+                pdf.save(`تفاصيل_العضو_${memberName}_جودة_عالية_${new Date().toISOString().split('T')[0]}.pdf`);
+
+                // Restore button
+                originalButton.innerHTML = originalText;
+                originalButton.disabled = false;
+
+            } catch (error) {
+                console.error('Error generating high-quality PDF:', error);
+                alert('حدث خطأ أثناء إنشاء ملف PDF عالي الجودة. يرجى المحاولة مرة أخرى.');
+                
+                // Restore button
+                const button = event.target;
+                button.innerHTML = '<i class="fas fa-download"></i> تحميل بجودة عالية';
+                button.disabled = false;
+            }
+        }
+
+        // Load member data when page loads
+        window.addEventListener('load', loadMemberData);
+    </script>
+</body>
+</html> 

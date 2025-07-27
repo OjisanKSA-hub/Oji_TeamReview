@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مراجعة الفريق</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-users"></i> مراجعة الفريق</h1>
+        </header>
+
+        <!-- Team Code Input Section -->
+        <div class="team-code-section">
+            <div class="code-input-container">
+                <label for="teamCodeInput">رمز الفريق:</label>
+                <div class="input-group">
+                    <input type="text" id="teamCodeInput" placeholder="أدخل رمز الفريق..." />
+                    <button id="loadTeamBtn" class="btn btn-primary">
+                        <i class="fas fa-search"></i> تحميل الفريق
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Information Display -->
+        <div id="teamInfo" class="team-info-section" style="display: none;">
+            <div class="team-leader-info">
+                <h2>معلومات قائد الفريق</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>الرمز:</label>
+                        <span id="teamCodeDisplay"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>الاسم:</label>
+                        <span id="teamLeaderName"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>الهاتف:</label>
+                        <span id="teamLeaderPhone"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>عدد الأعضاء:</label>
+                        <span id="teamMembers"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>البلد:</label>
+                        <span id="teamCountry"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>المدينة:</label>
+                        <span id="teamCity"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>المربع:</label>
+                        <span id="teamSquare"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>الشارع:</label>
+                        <span id="teamStreet"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>معلومات إضافية:</label>
+                        <span id="teamAdditionalInfo"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>خيار الطلب:</label>
+                        <span id="teamOrderOption"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>لون السترة:</label>
+                        <span id="teamJacketColor"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>لون الأكمام:</label>
+                        <span id="teamSleeveColor"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>لون مطاط الأكمام:</label>
+                        <span id="teamSleeveRubberColor"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>صورة ظهر السترة:</label>
+                        <span id="teamJacketBackImage"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>الحالة:</label>
+                        <span id="teamStatus"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>رابط المجلد:</label>
+                        <span id="teamFolderURL"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>تعليقات الرفع:</label>
+                        <span id="teamCommentsForUpload"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>صورة ظهر السترة:</label>
+                        <span id="teamJacketBackImageBB"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>إجمالي السعر:</label>
+                        <span id="teamTotalPrice"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Members Section -->
+            <div class="team-members-section">
+                <h2>أعضاء الفريق</h2>
+                <div id="teamMembersList">
+                    <!-- Team members will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="submit-section">
+                <button id="submitReviewBtn" class="btn btn-success" style="display: none;">
+                    <i class="fas fa-check"></i> إرسال المراجعة
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Member Details Modal -->
+    <div id="memberModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="memberModalTitle">تفاصيل العضو</h2>
+                <span class="close" id="memberModalClose">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="memberDetails">
+                    <!-- Member details will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="rejectMemberBtn" class="btn btn-danger">
+                    <i class="fas fa-times"></i> رفض
+                </button>
+                <button id="acceptMemberBtn" class="btn btn-success">
+                    <i class="fas fa-check"></i> قبول
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rejection Modal -->
+    <div id="rejectionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>رفض العضو</h2>
+                <span class="close" id="rejectionClose">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="rejection-form">
+                    <div class="form-group">
+                        <label for="rejectionComment">سبب الرفض:</label>
+                        <textarea id="rejectionComment" placeholder="أدخل سبب الرفض..." rows="4"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelRejectionBtn" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+                <button id="confirmRejectionBtn" class="btn btn-danger">
+                    <i class="fas fa-check"></i> تأكيد الرفض
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>جاري التحميل...</p>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 

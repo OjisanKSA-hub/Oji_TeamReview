@@ -642,7 +642,7 @@ function buildWebhookPayload(team, members, memberReviews) {
 // Helper to send webhook
 async function sendReviewWebhook(payload) {
     try {
-        await fetch('https://n8n.srv886746.hstgr.cloud/webhook-test/0b221e41-10c4-4fab-ae55-b0875cc42c8f', {
+        await fetch('https://n8n.srv886746.hstgr.cloud/webhook/0b221e41-10c4-4fab-ae55-b0875cc42c8f', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)

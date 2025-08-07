@@ -160,10 +160,20 @@ async function loadTeam() {
         // Initialize member reviews
         currentMembers.forEach(member => {
             if (!memberReviews[member.id]) {
-                memberReviews[member.id] = {
-                    status: 'pending',
-                    rejectionComment: null
-                };
+                // Check if member is already accepted from database
+                if (member.Status === 'accepted') {
+                    memberReviews[member.id] = {
+                        status: 'accepted',
+                        rejectionComment: null,
+                        locked: true // Mark as locked to prevent changes
+                    };
+                } else {
+                    memberReviews[member.id] = {
+                        status: 'pending',
+                        rejectionComment: null,
+                        locked: false
+                    };
+                }
             }
         });
         
@@ -292,12 +302,16 @@ function createMemberCard(member) {
     const review = memberReviews[member.id];
     const statusClass = review ? review.status : 'pending';
     const statusText = getStatusText(statusClass);
+    const isLocked = review && review.locked;
     
     return `
-        <div class="member-card ${review && review.status !== 'pending' ? 'reviewed ' + review.status : ''}" data-member-id="${member.id}">
+        <div class="member-card ${review && review.status !== 'pending' ? 'reviewed ' + review.status : ''} ${isLocked ? 'locked' : ''}" data-member-id="${member.id}">
             <div class="member-header">
                 <div class="member-name">${member.Name || member.NameBehind || 'غير متوفر'}</div>
-                <div class="member-status ${statusClass}">${statusText}</div>
+                <div class="member-status ${statusClass}">
+                    ${statusText}
+                    ${isLocked ? '<i class="fas fa-lock" title="مقبول مسبقاً - لا يمكن التعديل"></i>' : ''}
+                </div>
             </div>
             <div class="member-info">
                 <div class="member-info-item">
@@ -315,7 +329,7 @@ function createMemberCard(member) {
             </div>
             <div class="member-actions">
                 <button class="btn btn-primary" onclick="showMemberDetails(${member.id})">
-                    <i class="fas fa-eye"></i> عرض
+                    <i class="fas fa-eye"></i> ${isLocked ? 'عرض فقط' : 'عرض'}
                 </button>
             </div>
         </div>
@@ -341,6 +355,23 @@ async function showMemberDetails(memberId) {
     
     // Populate member details
     memberDetails.innerHTML = createMemberDetailsHTML(member);
+    
+    // Check if member is locked (already accepted from database)
+    const review = memberReviews[member.id];
+    const isLocked = review && review.locked;
+    
+    // Show/hide action buttons based on lock status
+    if (isLocked) {
+        // Hide accept/reject buttons for locked members
+        acceptMemberBtn.style.display = 'none';
+        rejectMemberBtn.style.display = 'none';
+        // Show notification for locked member
+        showNotification('هذا العضو مقبول مسبقاً - يمكنك فقط عرض البيانات وطباعة النموذج', 'info');
+    } else {
+        // Show accept/reject buttons for unlocked members
+        acceptMemberBtn.style.display = 'inline-flex';
+        rejectMemberBtn.style.display = 'inline-flex';
+    }
     
     // Show modal
     memberModal.style.display = 'block';
@@ -538,9 +569,17 @@ function closeRejectionModal() {
 function acceptMember() {
     if (!currentMember) return;
     
+    // Check if member is locked (already accepted from database)
+    const review = memberReviews[currentMember.id];
+    if (review && review.locked) {
+        showNotification('لا يمكن تغيير حالة العضو المقبول مسبقاً', 'error');
+        return;
+    }
+    
     memberReviews[currentMember.id] = {
         status: 'accepted',
-        rejectionComment: null
+        rejectionComment: null,
+        locked: false
     };
     
     closeMemberModal();
@@ -552,6 +591,14 @@ function acceptMember() {
 function confirmRejection() {
     if (!currentMember) return;
     
+    // Check if member is locked (already accepted from database)
+    const review = memberReviews[currentMember.id];
+    if (review && review.locked) {
+        showNotification('لا يمكن تغيير حالة العضو المقبول مسبقاً', 'error');
+        closeRejectionModal();
+        return;
+    }
+    
     const comment = rejectionComment.value.trim();
     if (!comment) {
         showNotification('يرجى إدخال سبب الرفض', 'error');
@@ -560,7 +607,8 @@ function confirmRejection() {
     
     memberReviews[currentMember.id] = {
         status: 'rejected',
-        rejectionComment: comment
+        rejectionComment: comment,
+        locked: false
     };
     
     closeRejectionModal();
@@ -761,6 +809,22 @@ async function initializeApp() {
 
 // Make functions globally available
 window.showMemberDetails = showMemberDetails;
+
+// Debug function to check member status
+window.debugMemberStatus = function() {
+    console.log('=== Member Status Debug ===');
+    console.log('Current Members:', currentMembers);
+    console.log('Member Reviews:', memberReviews);
+    
+    currentMembers.forEach(member => {
+        const review = memberReviews[member.id];
+        console.log(`Member ${member.id} (${member.Name || member.NameBehind}):`, {
+            dbStatus: member.Status,
+            reviewStatus: review ? review.status : 'none',
+            locked: review ? review.locked : false
+        });
+    });
+};
 
 // Handle image loading errors
 function handleImageError(imgElement, originalUrl) {

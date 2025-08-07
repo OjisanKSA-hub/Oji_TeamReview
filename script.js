@@ -130,23 +130,22 @@ async function loadTeam() {
             throw new Error('Supabase client not initialized');
         }
         
-        // Fetch team leader data with status 'ready'
+        // Fetch team leader data regardless of status
         const { data: team, error: teamError } = await supabase
             .from('team_leader_form')
             .select('*')
             .eq('TeamCode', teamCode)
-            .eq('Status', 'pending')
             .single();
         
         if (teamError) {
             if (teamError.code === 'PGRST116') {
-                throw new Error('تم مراجعة بيانات الفريق مسبقاً');
+                throw new Error('لم يتم العثور على بيانات الفريق');
             }
             throw teamError;
         }
 
         currentTeam = team;
-        
+
         // Fetch team members
         const { data: members, error: membersError } = await supabase
             .from('team_member_submission')
@@ -156,15 +155,21 @@ async function loadTeam() {
         if (membersError) throw membersError;
         
         currentMembers = members || [];
-        
+
         // Initialize member reviews
         currentMembers.forEach(member => {
             if (!memberReviews[member.id]) {
-                // Check if member is already accepted from database
+                // Check if member is already accepted or rejected from database
                 if (member.Status === 'accepted') {
                     memberReviews[member.id] = {
                         status: 'accepted',
                         rejectionComment: null,
+                        locked: true // Mark as locked to prevent changes
+                    };
+                } else if (member.Status === 'rejected') {
+                    memberReviews[member.id] = {
+                        status: 'rejected',
+                        rejectionComment: member.rejection_comment || null,
                         locked: true // Mark as locked to prevent changes
                     };
                 } else {
@@ -176,11 +181,27 @@ async function loadTeam() {
                 }
             }
         });
-        
+
         // Display team information
         displayTeamInfo();
         displayTeamMembers();
-        
+
+        // Show/hide review button and show status if not pending
+        if (currentTeam.Status === 'accepted' || currentTeam.Status === 'rejected') {
+            // Hide review button
+            submitReviewBtn.style.display = 'none';
+            // Show status in the index (teamInfo)
+            const statusElem = document.getElementById('teamStatus');
+            if (statusElem) {
+                statusElem.textContent = currentTeam.Status === 'accepted' ? 'مقبول' : 'مرفوض';
+                statusElem.className = 'team-status ' + currentTeam.Status;
+            }
+            showNotification('تمت مراجعة هذا الفريق مسبقاً. يمكنك فقط عرض وطباعة النماذج.', 'info');
+        } else {
+            // Pending: keep current workflow
+            updateSubmitButton();
+        }
+
         showNotification(`تم تحميل الفريق بنجاح (${currentMembers.length} عضو)`, 'success');
         
     } catch (error) {
@@ -228,7 +249,34 @@ function displayTeamInfo() {
         openJacketBackImageBBBtn.style.display = 'none';
     }
     
-    document.getElementById('teamStatus').textContent = currentTeam.Status || 'غير متوفر';
+    // Set form status label
+    const formStatusLabel = document.getElementById('formStatusLabel');
+    let statusText = 'غير معروف';
+    let statusClass = 'pending';
+    switch ((currentTeam.Status || '').toLowerCase()) {
+        case 'pending':
+            statusText = 'قيد المراجعة';
+            statusClass = 'pending';
+            break;
+        case 'accepted':
+            statusText = 'مقبول';
+            statusClass = 'accepted';
+            break;
+        case 'rejected':
+            statusText = 'مرفوض';
+            statusClass = 'rejected';
+            break;
+        default:
+            statusText = currentTeam.Status || 'غير معروف';
+            statusClass = 'pending';
+    }
+    if (formStatusLabel) {
+        formStatusLabel.textContent = `حالة النموذج: ${statusText}`;
+        formStatusLabel.className = `form-status-label ${statusClass}`;
+    }
+    // Also update the old teamStatus span for compatibility
+    document.getElementById('teamStatus').textContent = statusText;
+    document.getElementById('teamStatus').className = `team-status ${statusClass}`;
     
     // Handle Folder URL with button
     const folderURL = currentTeam['Folder URL'] || '';

@@ -146,11 +146,12 @@ async function loadTeam() {
 
         currentTeam = team;
 
-        // Fetch team members
+        // Fetch team members (only pending and accepted)
         const { data: members, error: membersError } = await supabase
             .from('team_member_submission')
             .select('*')
-            .eq('TeamCode', parseInt(teamCode));
+            .eq('TeamCode', parseInt(teamCode))
+            .in('Status', ['pending', 'accepted']);
         
         if (membersError) throw membersError;
         

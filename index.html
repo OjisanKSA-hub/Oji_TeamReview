@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -29,8 +31,12 @@
         <!-- Team Information Display -->
         <div id="teamInfo" class="team-info-section" style="display: none;">
             <div id="formStatusLabel" class="form-status-label" style="margin-bottom: 15px;"></div>
-            <div class="team-leader-info">
-                <h2>معلومات قائد المجموعة</h2>
+            <!-- بيانات قائد المجموعة -->
+            <div class="team-leader-info modern-section">
+                <div class="section-header">
+                    <i class="fas fa-user-tie"></i>
+                    <h2>بيانات قائد المجموعة</h2>
+                </div>
                 <div class="info-grid">
                     <div class="info-item">
                         <label>الرمز:</label>
@@ -44,10 +50,16 @@
                         <label>الهاتف:</label>
                         <span id="teamLeaderPhone"></span>
                     </div>
-                    <div class="info-item">
-                        <label>عدد الأعضاء:</label>
-                        <span id="teamMembers"></span>
-                    </div>
+                </div>
+            </div>
+
+            <!-- بيانات الشحن -->
+            <div class="shipping-info modern-section">
+                <div class="section-header">
+                    <i class="fas fa-shipping-fast"></i>
+                    <h2>بيانات الشحن</h2>
+                </div>
+                <div class="info-grid">
                     <div class="info-item">
                         <label>البلد:</label>
                         <span id="teamCountry"></span>
@@ -65,32 +77,26 @@
                         <span id="teamStreet"></span>
                     </div>
                     <div class="info-item">
-                        <label>معلومات إضافية:</label>
+                        <label> بيانات شحن اضافية:</label>
                         <span id="teamAdditionalInfo"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- بيانات الطلب -->
+            <div class="order-info modern-section">
+                <div class="section-header">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h2>بيانات الطلب</h2>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>عدد الأعضاء:</label>
+                        <span id="teamMembers"></span>
                     </div>
                     <div class="info-item">
                         <label>خيار الطلب:</label>
                         <span id="teamOrderOption"></span>
-                    </div>
-                    <div class="info-item">
-                        <label>لون السترة:</label>
-                        <span id="teamJacketColor"></span>
-                    </div>
-                    <div class="info-item">
-                        <label>لون الأكمام:</label>
-                        <span id="teamSleeveColor"></span>
-                    </div>
-                    <div class="info-item">
-                        <label>لون مطاط الأكمام:</label>
-                        <span id="teamSleeveRubberColor"></span>
-                    </div>
-                    <div class="info-item">
-                        <label>صورة ظهر السترة:</label>
-                        <div class="info-item-with-button">
-                            <button id="openJacketBackImageBtn" class="btn btn-primary btn-sm" style="display: none;">
-                                <i class="fas fa-external-link-alt"></i> فتح الرابط
-                            </button>
-                        </div>
                     </div>
                     <div class="info-item">
                         <label>الحالة:</label>
@@ -100,18 +106,6 @@
                         <label>رابط المجلد:</label>
                         <div class="info-item-with-button">
                             <button id="openFolderURLBtn" class="btn btn-primary btn-sm" style="display: none;">
-                                <i class="fas fa-external-link-alt"></i> فتح الرابط
-                            </button>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <label>تعليقات الرفع:</label>
-                        <span id="teamCommentsForUpload"></span>
-                    </div>
-                    <div class="info-item">
-                        <label>صورة ظهر السترة:</label>
-                        <div class="info-item-with-button">
-                            <button id="openJacketBackImageBBBtn" class="btn btn-primary btn-sm" style="display: none;">
                                 <i class="fas fa-external-link-alt"></i> فتح الرابط
                             </button>
                         </div>
@@ -144,7 +138,7 @@
     <div id="memberModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="memberModalTitle">تفاصيل العضو</h2>
+                <h2 id="memberModalTitle">بيانات طلب العضو                </h2>
                 <span class="close" id="memberModalClose">&times;</span>
             </div>
             <div class="modal-body">
@@ -205,4 +199,5 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="script.js"></script>
 </body>
-</html> 
+
+</html>

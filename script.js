@@ -197,7 +197,7 @@ async function loadTeam() {
                 statusElem.textContent = currentTeam.Status === 'accepted' ? 'مقبول' : 'مرفوض';
                 statusElem.className = 'team-status ' + currentTeam.Status;
             }
-            showNotification('تمت مراجعة هذا الفريق مسبقاً. يمكنك فقط عرض وطباعة النماذج.', 'info');
+            showNotification('تمت مراجعة هذا الفريق مسبقاً. يمكنك فقط عرض وطباعة الطلبات.', 'info');
         } else {
             // Pending: keep current workflow
             updateSubmitButton();
@@ -225,30 +225,6 @@ function displayTeamInfo() {
     document.getElementById('teamStreet').textContent = currentTeam.Street || 'غير متوفر';
     document.getElementById('teamAdditionalInfo').textContent = currentTeam['Additional Info'] || 'غير متوفر';
     document.getElementById('teamOrderOption').textContent = currentTeam['Order Option'] || 'غير متوفر';
-    document.getElementById('teamJacketColor').textContent = currentTeam['Jacket Color'] || 'غير متوفر';
-    document.getElementById('teamSleeveColor').textContent = currentTeam['Sleeve Color'] || 'غير متوفر';
-    document.getElementById('teamSleeveRubberColor').textContent = currentTeam['Sleeve Rubber Color'] || 'غير متوفر';
-    // Handle Jacket Back Image with button
-    const jacketBackImage = currentTeam['Jacket Back Image'] || '';
-    const jacketBackImageBB = currentTeam.JacketBackImageBB || '';
-    
-    // Show/hide buttons based on link availability
-    const openJacketBackImageBtn = document.getElementById('openJacketBackImageBtn');
-    const openJacketBackImageBBBtn = document.getElementById('openJacketBackImageBBBtn');
-    
-    if (jacketBackImage && jacketBackImage.trim() !== '') {
-        openJacketBackImageBtn.style.display = 'inline-block';
-        openJacketBackImageBtn.onclick = () => window.open(jacketBackImage, '_blank');
-    } else {
-        openJacketBackImageBtn.style.display = 'none';
-    }
-    
-    if (jacketBackImageBB && jacketBackImageBB.trim() !== '') {
-        openJacketBackImageBBBtn.style.display = 'inline-block';
-        openJacketBackImageBBBtn.onclick = () => window.open(jacketBackImageBB, '_blank');
-    } else {
-        openJacketBackImageBBBtn.style.display = 'none';
-    }
     
     // Set form status label
     const formStatusLabel = document.getElementById('formStatusLabel');
@@ -272,7 +248,7 @@ function displayTeamInfo() {
             statusClass = 'pending';
     }
     if (formStatusLabel) {
-        formStatusLabel.textContent = `حالة النموذج: ${statusText}`;
+        formStatusLabel.textContent = `حالة الطلب: ${statusText}`;
         formStatusLabel.className = `form-status-label ${statusClass}`;
     }
     // Also update the old teamStatus span for compatibility
@@ -291,7 +267,7 @@ function displayTeamInfo() {
         openFolderURLBtn.style.display = 'none';
     }
     
-    document.getElementById('teamCommentsForUpload').textContent = currentTeam.CommentsForUpload || 'غير متوفر';
+
     
     // Calculate and display total price
     const totalPrice = calculateTotalPrice();
@@ -388,7 +364,7 @@ function createMemberCard(member) {
 // Get status text
 function getStatusText(status) {
     switch(status) {
-        case 'pending': return 'في الانتظار';
+        case 'pending': return 'قيد المراجعة';
         case 'accepted': return 'مقبول';
         case 'rejected': return 'مرفوض';
         default: return 'غير معروف';
@@ -415,7 +391,7 @@ async function showMemberDetails(memberId) {
         acceptMemberBtn.style.display = 'none';
         rejectMemberBtn.style.display = 'none';
         // Show notification for locked member
-        showNotification('هذا العضو مقبول مسبقاً - يمكنك فقط عرض البيانات وطباعة النموذج', 'info');
+        showNotification('هذا العضو مقبول مسبقاً - يمكنك فقط عرض البيانات وطباعة الطلب', 'info');
     } else {
         // Show accept/reject buttons for unlocked members
         acceptMemberBtn.style.display = 'inline-flex';
@@ -449,6 +425,21 @@ function createMemberDetailsHTML(member) {
     
     return `
         <div class="member-details-container">
+            ${member.SubFolder ? `
+            <div class="member-folder-section">
+                <h3>مجلد العضو</h3>
+                <div class="folder-item">
+                    <div class="folder-info">
+                        <i class="fas fa-folder"></i>
+                        <span>مجلد Google Drive</span>
+                    </div>
+                    <a href="${member.SubFolder}" target="_blank" class="btn btn-primary">
+                        <i class="fas fa-external-link-alt"></i> فتح المجلد
+                    </a>
+                </div>
+            </div>
+            ` : ''}
+            
             <div class="member-basic-info">
                 <h3>المعلومات الأساسية</h3>
                 <div class="member-basic-info-grid">
@@ -480,33 +471,39 @@ function createMemberDetailsHTML(member) {
                         <label>نوع الأكمام:</label>
                         <span>${member.SleeveType || 'غير متوفر'}</span>
                     </div>
+                </div>
+            </div>
+            
+            <!-- الاضافات المجانية -->
+            <div class="member-free-additions-section">
+                <h3>الاضافات المجانية المشمولة بالسعر</h3>
+                <div class="member-basic-info-grid">
                     <div class="info-item">
-                        <label>الجيب المخفي:</label>
+                        <label>جيب مخفي:</label>
                         <span>${member.HiddenPocket || 'غير متوفر'}</span>
                     </div>
                     <div class="info-item">
-                        <label>البطانة الداخلية:</label>
+                        <label>بطانة داخلية سادة:</label>
                         <span>${member.InnerLining || 'غير متوفر'}</span>
                     </div>
+                </div>
+            </div>
+            
+            <!-- الاضافات المدفوعة -->
+            <div class="member-paid-additions-section">
+                <h3>الإضافات المدفوعة</h3>
+                <div class="member-basic-info-grid">
                     <div class="info-item">
-                        <label>تعليق البطانة:</label>
-                        <span>${member.InnerlinningComment || 'غير متوفر'}</span>
-                    </div>
-                    <div class="info-item">
-                        <label>تطريز البطانة:</label>
-                        <span>${member.InnerLinningTatreez || 'غير متوفر'}</span>
-                    </div>
-                    <div class="info-item">
-                        <label>تعليق تطريز البطانة:</label>
-                        <span>${member.InnerLinningTatreezComment || 'غير متوفر'}</span>
-                    </div>
-                    <div class="info-item">
-                        <label>القبعة الثابتة:</label>
+                        <label>قبعة ثابتة 35 ريال:</label>
                         <span>${member.FixedCap || 'غير متوفر'}</span>
                     </div>
                     <div class="info-item">
-                        <label>السترة كاملة الجلد:</label>
+                        <label>جلد كامل للجاكيت 50 ريال:</label>
                         <span>${member.JacketFullLeather || 'غير متوفر'}</span>
+                    </div>
+                    <div class="info-item">
+                        <label>تطريز بطانة 35 ريال:</label>
+                        <span>${member.InnerLinningTatreez || 'غير متوفر'}</span>
                     </div>
                     <div class="info-item">
                         <label>السعر النهائي:</label>
@@ -552,36 +549,27 @@ function createMemberDetailsHTML(member) {
             
             ${member.InnerLinningTatreezImage ? `
             <div class="member-tatreez-section">
-                <h3>صورة تطريز البطانة</h3>
+                <h3>تطريز البطانة</h3>
                 <div class="tatreez-image-container">
                     <div class="image-actions">
                         <a href="${member.InnerLinningTatreezImage}" target="_blank" class="btn btn-primary">
                             <i class="fas fa-external-link-alt"></i> الذهاب إلى Google Drive
                         </a>
                     </div>
-                </div>
-                ${member.InnerLinningTatreezImageBB ? `
-                    <div class="image-preview-section">
-                        <h5>معاينة صورة تطريز البطانة:</h5>
-                        <div class="image-preview-container">
-                            <img src="${member.InnerLinningTatreezImageBB}" alt="معاينة صورة تطريز البطانة" onerror="handleImageError(this, '${member.InnerLinningTatreezImageBB}')" onload="handleImageSuccess(this, '${member.InnerLinningTatreezImageBB}')">
+                    ${member.InnerLinningTatreezImageBB ? `
+                        <div class="image-preview-section">
+                            <h5>معاينة صورة تطريز البطانة:</h5>
+                            <div class="image-preview-container">
+                                <img src="${member.InnerLinningTatreezImageBB}" alt="معاينة صورة تطريز البطانة" onerror="handleImageError(this, '${member.InnerLinningTatreezImageBB}')" onload="handleImageSuccess(this, '${member.InnerLinningTatreezImageBB}')">
+                            </div>
                         </div>
-                    </div>
-                ` : ''}
-            </div>
-            ` : ''}
-            
-            ${member.SubFolder ? `
-            <div class="member-folder-section">
-                <h3>مجلد العضو</h3>
-                <div class="folder-item">
-                    <div class="folder-info">
-                        <i class="fas fa-folder"></i>
-                        <span>مجلد Google Drive</span>
-                    </div>
-                    <a href="${member.SubFolder}" target="_blank" class="btn btn-primary">
-                        <i class="fas fa-external-link-alt"></i> فتح المجلد
-                    </a>
+                    ` : ''}
+                    ${member.InnerlinningComment ? `
+                        <div class="image-comment">
+                            <strong>تعليق البطانة:</strong> 
+                            ${member.InnerlinningComment}
+                        </div>
+                    ` : ''}
                 </div>
             </div>
             ` : ''}

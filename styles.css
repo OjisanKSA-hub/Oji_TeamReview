@@ -114,6 +114,49 @@ header h1 i {
     font-weight: 600;
 }
 
+/* Modern Section Styles */
+.modern-section {
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    transition: all 0.3s ease;
+}
+
+.modern-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f2f5;
+}
+
+.section-header i {
+    font-size: 1.5rem;
+    color: #667eea;
+    margin-left: 12px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.section-header h2 {
+    color: #333;
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0;
+    border: none;
+    padding: 0;
+}
+
 .team-members-section h2 {
     color: #333;
     font-size: 1.5rem;
@@ -881,6 +924,38 @@ header h1 i {
 .member-actions-section .btn {
     font-size: 16px;
     padding: 12px 24px;
+}
+
+/* Paid Additions Section */
+.member-paid-additions-section {
+    margin-top: 30px;
+    padding: 20px;
+    background: #fff3cd;
+    border-radius: 8px;
+    border: 1px solid #ffeaa7;
+}
+
+.member-paid-additions-section h3 {
+    margin: 0 0 15px 0;
+    color: #856404;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+/* Free Additions Section */
+.member-free-additions-section {
+    margin-top: 30px;
+    padding: 20px;
+    background: #d1ecf1;
+    border-radius: 8px;
+    border: 1px solid #bee5eb;
+}
+
+.member-free-additions-section h3 {
+    margin: 0 0 15px 0;
+    color: #0c5460;
+    font-size: 1.3rem;
+    font-weight: 600;
 }
 
 @media (max-width: 480px) {

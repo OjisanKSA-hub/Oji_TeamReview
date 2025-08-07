@@ -135,7 +135,7 @@ async function loadTeam() {
             .from('team_leader_form')
             .select('*')
             .eq('TeamCode', teamCode)
-            .eq('Status', 'ready')
+            .eq('Status', 'pending')
             .single();
         
         if (teamError) {
@@ -183,7 +183,7 @@ async function loadTeam() {
 
 // Display team information
 function displayTeamInfo() {
-    document.getElementById('teamCodeDisplay').textContent = currentTeam.Code || 'غير متوفر';
+    document.getElementById('teamCode').textContent = currentTeam.TeamCode || 'غير متوفر';
     document.getElementById('teamLeaderName').textContent = currentTeam.Name || 'غير متوفر';
     document.getElementById('teamLeaderPhone').textContent = currentTeam.Phone || 'غير متوفر';
     document.getElementById('teamMembers').textContent = currentTeam['Team Members'] || 'غير متوفر';
@@ -196,11 +196,43 @@ function displayTeamInfo() {
     document.getElementById('teamJacketColor').textContent = currentTeam['Jacket Color'] || 'غير متوفر';
     document.getElementById('teamSleeveColor').textContent = currentTeam['Sleeve Color'] || 'غير متوفر';
     document.getElementById('teamSleeveRubberColor').textContent = currentTeam['Sleeve Rubber Color'] || 'غير متوفر';
-    document.getElementById('teamJacketBackImage').textContent = currentTeam['Jacket Back Image'] || 'غير متوفر';
+    // Handle Jacket Back Image with button
+    const jacketBackImage = currentTeam['Jacket Back Image'] || '';
+    const jacketBackImageBB = currentTeam.JacketBackImageBB || '';
+    
+    // Show/hide buttons based on link availability
+    const openJacketBackImageBtn = document.getElementById('openJacketBackImageBtn');
+    const openJacketBackImageBBBtn = document.getElementById('openJacketBackImageBBBtn');
+    
+    if (jacketBackImage && jacketBackImage.trim() !== '') {
+        openJacketBackImageBtn.style.display = 'inline-block';
+        openJacketBackImageBtn.onclick = () => window.open(jacketBackImage, '_blank');
+    } else {
+        openJacketBackImageBtn.style.display = 'none';
+    }
+    
+    if (jacketBackImageBB && jacketBackImageBB.trim() !== '') {
+        openJacketBackImageBBBtn.style.display = 'inline-block';
+        openJacketBackImageBBBtn.onclick = () => window.open(jacketBackImageBB, '_blank');
+    } else {
+        openJacketBackImageBBBtn.style.display = 'none';
+    }
+    
     document.getElementById('teamStatus').textContent = currentTeam.Status || 'غير متوفر';
-    document.getElementById('teamFolderURL').textContent = currentTeam['Folder URL'] || 'غير متوفر';
+    
+    // Handle Folder URL with button
+    const folderURL = currentTeam['Folder URL'] || '';
+    
+    // Show/hide Folder URL button based on link availability
+    const openFolderURLBtn = document.getElementById('openFolderURLBtn');
+    if (folderURL && folderURL.trim() !== '') {
+        openFolderURLBtn.style.display = 'inline-block';
+        openFolderURLBtn.onclick = () => window.open(folderURL, '_blank');
+    } else {
+        openFolderURLBtn.style.display = 'none';
+    }
+    
     document.getElementById('teamCommentsForUpload').textContent = currentTeam.CommentsForUpload || 'غير متوفر';
-    document.getElementById('teamJacketBackImageBB').textContent = currentTeam.JacketBackImageBB || 'غير متوفر';
     
     // Calculate and display total price
     const totalPrice = calculateTotalPrice();
@@ -661,7 +693,7 @@ async function submitReview() {
         const hasRejected = reviews.some(review => review.status === 'rejected');
         
         // Update team leader status
-        const teamStatus = hasRejected ? 'rejected' : 'completed';
+        const teamStatus = hasRejected ? 'rejected' : 'accepted';
         const { error: teamError } = await supabase
             .from('team_leader_form')
             .update({ Status: teamStatus })
@@ -757,9 +789,49 @@ function handleImageSuccess(imgElement, originalUrl) {
     console.log('✅ Image loaded successfully:', originalUrl);
 }
 
+// Generate a unique ID for storing member data
+function generateMemberDataId() {
+    return 'member_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
 
+// Store member data in localStorage and return the ID
+function storeMemberData(member) {
+    const dataId = generateMemberDataId();
+    const memberData = {
+        member: member,
+        timestamp: Date.now()
+    };
+    
+    try {
+        localStorage.setItem(dataId, JSON.stringify(memberData));
+        return dataId;
+    } catch (error) {
+        console.error('Error storing member data in localStorage:', error);
+        // Fallback: if localStorage fails, use URL parameters but with a warning
+        showNotification('تحذير: البيانات كبيرة جداً، قد لا تفتح الصفحة بشكل صحيح', 'warning');
+        return null;
+    }
+}
 
-// Download member form as PDF
+// Clean up old member data from localStorage (older than 1 hour)
+function cleanupOldMemberData() {
+    const oneHourAgo = Date.now() - (60 * 60 * 1000);
+    Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('member_')) {
+            try {
+                const data = JSON.parse(localStorage.getItem(key));
+                if (data.timestamp && data.timestamp < oneHourAgo) {
+                    localStorage.removeItem(key);
+                }
+            } catch (e) {
+                // If parsing fails, remove the invalid entry
+                localStorage.removeItem(key);
+            }
+        }
+    });
+}
+
+// PDF download function
 async function downloadMemberPDF(memberId) {
     const member = currentMembers.find(m => m.id === memberId);
     if (!member) {
@@ -770,12 +842,22 @@ async function downloadMemberPDF(memberId) {
     try {
         console.log('Opening PDF page for member:', memberId);
         
-        // Encode member data for URL
-        const memberData = encodeURIComponent(JSON.stringify(member));
+        // Clean up old data first
+        cleanupOldMemberData();
         
-        // Open the PDF page in a new tab
-        const pdfUrl = `member-pdf.html?member=${memberData}`;
-        window.open(pdfUrl, '_blank');
+        // Store member data in localStorage and get the ID
+        const dataId = storeMemberData(member);
+        
+        if (dataId) {
+            // Open the PDF page with only the data ID in URL
+            const pdfUrl = `member-pdf.html?dataId=${dataId}`;
+            window.open(pdfUrl, '_blank');
+        } else {
+            // Fallback to URL parameters if localStorage failed
+            const memberData = encodeURIComponent(JSON.stringify(member));
+            const pdfUrl = `member-pdf.html?member=${memberData}`;
+            window.open(pdfUrl, '_blank');
+        }
         
         showNotification('تم فتح صفحة PDF في تبويب جديد', 'success');
         
@@ -796,12 +878,22 @@ async function downloadMemberPDFHighQuality(memberId) {
     try {
         console.log('Opening high-quality PDF page for member:', memberId);
         
-        // Encode member data for URL
-        const memberData = encodeURIComponent(JSON.stringify(member));
+        // Clean up old data first
+        cleanupOldMemberData();
         
-        // Open the PDF page in a new tab
-        const pdfUrl = `member-pdf.html?member=${memberData}`;
-        window.open(pdfUrl, '_blank');
+        // Store member data in localStorage and get the ID
+        const dataId = storeMemberData(member);
+        
+        if (dataId) {
+            // Open the PDF page with only the data ID in URL
+            const pdfUrl = `member-pdf.html?dataId=${dataId}`;
+            window.open(pdfUrl, '_blank');
+        } else {
+            // Fallback to URL parameters if localStorage failed
+            const memberData = encodeURIComponent(JSON.stringify(member));
+            const pdfUrl = `member-pdf.html?member=${memberData}`;
+            window.open(pdfUrl, '_blank');
+        }
         
         showNotification('تم فتح صفحة PDF في تبويب جديد', 'success');
         
@@ -1049,7 +1141,7 @@ window.testPDFStepByStep = async function(memberId) {
             console.error('❌ Data URL too small');
         }
         
-        console.log('=== Test completed ===');
+        console.log('=== Test accepted ===');
         
     } catch (error) {
         console.error('❌ Test failed:', error);

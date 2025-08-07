@@ -285,6 +285,14 @@ header h1 i {
     transform: translateY(-2px);
 }
 
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.875rem;
+    border-radius: 6px;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
 /* Modal styles */
 .modal {
     display: none;
@@ -366,6 +374,20 @@ header h1 i {
 .info-item {
     display: flex;
     flex-direction: column;
+    gap: 5px;
+}
+
+.info-item-with-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.info-item-with-button .info-content {
+    flex: 1;
+    min-width: 0;
 }
 
 .info-item label {

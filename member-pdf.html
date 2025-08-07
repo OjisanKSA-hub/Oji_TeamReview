@@ -275,6 +275,51 @@
                 box-shadow: none;
                 margin: 0;
                 max-width: none;
+                page-break-inside: avoid;
+            }
+            
+            /* Ensure no page breaks within content */
+            .member-details-container,
+            .member-basic-info,
+            .member-images-section,
+            .member-tatreez-section,
+            .image-item,
+            .member-basic-info-grid,
+            .info-item {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            
+            /* Prevent page breaks between sections */
+            h3 {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+            
+            /* Ensure images don't break across pages */
+            .image-preview-container,
+            .image-container {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            
+            /* Set page size to accommodate long content */
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+            
+            /* Force single page layout */
+            body {
+                height: auto !important;
+                overflow: visible !important;
+            }
+            
+            .modal-content {
+                height: auto !important;
+                overflow: visible !important;
+                page-break-after: avoid;
+                break-after: avoid;
             }
         }
 
@@ -472,15 +517,55 @@
             `;
         }
 
-        // Load member data from URL parameters
+        // Load member data from localStorage using dataId from URL, with fallback to URL parameters
         function loadMemberData() {
             const urlParams = new URLSearchParams(window.location.search);
+            const dataId = urlParams.get('dataId');
             const memberData = urlParams.get('member');
             
-            if (memberData) {
+            if (dataId) {
+                try {
+                    // Get member data from localStorage
+                    const storedData = localStorage.getItem(dataId);
+                    if (storedData) {
+                        const data = JSON.parse(storedData);
+                        const member = data.member;
+                        
+                        console.log('Member data loaded from localStorage:', member);
+                        
+                        // Update modal title
+                        document.getElementById('memberModalTitle').textContent = `تفاصيل العضو - ${member.Name || member.NameBehind || 'غير معروف'}`;
+                        
+                        // Load member details
+                        document.getElementById('memberDetails').innerHTML = createMemberDetailsHTML(member);
+                        
+                        // Clean up the data from localStorage after loading
+                        localStorage.removeItem(dataId);
+                        
+                        // Wait for images to load
+                        setTimeout(() => {
+                            const images = document.querySelectorAll('img');
+                            console.log(`Found ${images.length} images to load`);
+                        }, 1000);
+                        
+                    } else {
+                        throw new Error('Member data not found in localStorage');
+                    }
+                    
+                } catch (error) {
+                    console.error('Error loading member data from localStorage:', error);
+                    document.getElementById('memberDetails').innerHTML = `
+                        <div class="loading">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>حدث خطأ في تحميل بيانات العضو من التخزين المحلي</p>
+                        </div>
+                    `;
+                }
+            } else if (memberData) {
+                // Fallback: try to load from URL parameters
                 try {
                     const member = JSON.parse(decodeURIComponent(memberData));
-                    console.log('Member data loaded:', member);
+                    console.log('Member data loaded from URL parameters:', member);
                     
                     // Update modal title
                     document.getElementById('memberModalTitle').textContent = `تفاصيل العضو - ${member.Name || member.NameBehind || 'غير معروف'}`;
@@ -495,11 +580,11 @@
                     }, 1000);
                     
                 } catch (error) {
-                    console.error('Error parsing member data:', error);
+                    console.error('Error parsing member data from URL:', error);
                     document.getElementById('memberDetails').innerHTML = `
                         <div class="loading">
                             <i class="fas fa-exclamation-triangle"></i>
-                            <p>حدث خطأ في تحميل بيانات العضو</p>
+                            <p>حدث خطأ في تحميل بيانات العضو من الرابط</p>
                         </div>
                     `;
                 }
@@ -513,7 +598,7 @@
             }
         }
 
-        // Basic PDF download function (exactly like test.html)
+        // Basic PDF download function - Single long page
         async function downloadMemberPDF() {
             try {
                 // Show loading indicator
@@ -548,32 +633,22 @@
                     downloadControls.style.display = 'block';
                 }
 
-                // Create PDF
+                // Create PDF with custom page size for single long page
                 const { jsPDF } = window.jspdf;
+                
+                // Calculate custom page size based on content
+                const imgWidth = 210; // A4 width in mm
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                const customPageHeight = Math.max(imgHeight, 297); // At least A4 height
+                
                 const pdf = new jsPDF({
                     orientation: 'portrait',
                     unit: 'mm',
-                    format: 'a4'
+                    format: [210, customPageHeight] // Custom size for single long page
                 });
 
-                // Calculate dimensions
-                const imgWidth = 210; // A4 width in mm
-                const pageHeight = 295; // A4 height in mm
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                let heightLeft = imgHeight;
-                let position = 0;
-
-                // Add first page
-                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-
-                // Add additional pages if content is longer than one page
-                while (heightLeft >= 0) {
-                    position = heightLeft - imgHeight;
-                    pdf.addPage();
-                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-                }
+                // Add the entire content as a single image
+                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, imgWidth, imgHeight);
 
                 // Download the PDF
                 const memberName = document.querySelector('.info-item span').textContent || 'member';
@@ -594,7 +669,7 @@
             }
         }
 
-        // High quality PDF download function (exactly like test.html)
+        // High quality PDF download function - Single long page
         async function downloadMemberPDFHighQuality() {
             try {
                 // Show loading indicator
@@ -632,36 +707,23 @@
                     downloadControls.style.display = 'block';
                 }
 
-                // Create PDF with higher quality settings
+                // Create PDF with custom page size for single long page
                 const { jsPDF } = window.jspdf;
+                
+                // Calculate custom page size based on content
+                const imgWidth = 190; // A4 width minus margins in mm
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                const customPageHeight = Math.max(imgHeight, 297); // At least A4 height
+                
                 const pdf = new jsPDF({
                     orientation: 'portrait',
                     unit: 'mm',
-                    format: 'a4',
+                    format: [210, customPageHeight], // Custom size for single long page
                     compress: true
                 });
 
-                // Calculate dimensions for better fit
-                const pageWidth = 210; // A4 width in mm
-                const pageHeight = 295; // A4 height in mm
-                const margin = 10; // 10mm margin
-                const imgWidth = pageWidth - (margin * 2);
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                
-                let heightLeft = imgHeight;
-                let position = margin;
-
-                // Add first page
-                pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, position, imgWidth, imgHeight);
-                heightLeft -= (pageHeight - margin * 2);
-
-                // Add additional pages if needed
-                while (heightLeft >= 0) {
-                    position = heightLeft - imgHeight + margin;
-                    pdf.addPage();
-                    pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, position, imgWidth, imgHeight);
-                    heightLeft -= (pageHeight - margin * 2);
-                }
+                // Add the entire content as a single image with margins
+                pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 10, 10, imgWidth, imgHeight);
 
                 // Download the PDF
                 const memberName = document.querySelector('.info-item span').textContent || 'member';

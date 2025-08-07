@@ -427,7 +427,7 @@ function createMemberDetailsHTML(member) {
         <div class="member-details-container">
             ${member.SubFolder ? `
             <div class="member-folder-section">
-                <h3>مجلد العضو</h3>
+                <h3>مجلد بيانات الطلب</h3>
                 <div class="folder-item">
                     <div class="folder-info">
                         <i class="fas fa-folder"></i>

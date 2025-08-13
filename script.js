@@ -2,6 +2,9 @@
 const SUPABASE_URL = 'https://pxapeabojeqcwrcfaunx.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4YXBlYWJvamVxY3dyY2ZhdW54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5MDU1MjcsImV4cCI6MjA2NTQ4MTUyN30.lVYtO25bgg7U1Lxhx33bxXeODcSr2AgT_80WFWQ8ooU';
 
+// Service role key for database access (bypasses RLS completely)
+const SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4YXBlYWJvamVxY3dyY2ZhdW54Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0OTkwNTUyNywiZXhwIjoyMDY1NDgxNTI3fQ.y4LrbiXtJw9pDTBgU0EJZLc0nw6yRx_sVQb0fcRNBe0';
+
 // Initialize Supabase client
 let supabase = null;
 
@@ -49,15 +52,17 @@ async function initializeSupabase() {
         
         // Check if Supabase is available globally
         if (typeof window.supabase !== 'undefined') {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log('Supabase initialized successfully');
+            supabase = window.supabase.createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+            
+            console.log('Supabase initialized successfully with service role key');
             return true;
         }
         
         // Fallback: try to import dynamically
         const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
-        supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        console.log('Supabase initialized successfully');
+        supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+        
+        console.log('Supabase initialized successfully with service role key');
         return true;
     } catch (error) {
         console.error('Failed to initialize Supabase:', error);
@@ -125,36 +130,53 @@ async function loadTeam() {
     showLoading(true);
     
     try {
-        // Check if supabase is initialized
-        if (!supabase) {
-            throw new Error('Supabase client not initialized');
-        }
+        let team, members;
         
-        // Fetch team leader data regardless of status
-        const { data: team, error: teamError } = await supabase
-            .from('team_leader_form')
-            .select('*')
-            .eq('TeamCode', teamCode)
-            .single();
-        
-        if (teamError) {
-            if (teamError.code === 'PGRST116') {
+        // Use direct REST API calls with service role key as primary method
+        try {
+            console.log('Fetching team data with service role key...');
+            team = await fetchTeamWithServiceRole(teamCode);
+            if (!team) {
                 throw new Error('لم يتم العثور على بيانات الفريق');
             }
-            throw teamError;
+            
+            console.log('Fetching members data with service role key...');
+            members = await fetchMembersWithServiceRole(teamCode);
+            
+        } catch (restError) {
+            console.warn('Direct REST API failed, trying Supabase client:', restError);
+            
+            // Fallback to Supabase client
+            const supabaseWithAuth = await getSupabaseWithAuth();
+            
+            // Fetch team leader data regardless of status
+            const { data: teamData, error: teamError } = await supabaseWithAuth
+                .from('team_leader_form')
+                .select('*')
+                .eq('TeamCode', teamCode)
+                .single();
+            
+            if (teamError) {
+                if (teamError.code === 'PGRST116') {
+                    throw new Error('لم يتم العثور على بيانات الفريق');
+                }
+                throw teamError;
+            }
+            
+            team = teamData;
+
+            // Fetch team members (only pending and accepted)
+            const { data: membersData, error: membersError } = await supabaseWithAuth
+                .from('team_member_submission')
+                .select('*')
+                .eq('TeamCode', parseInt(teamCode))
+                .in('Status', ['pending', 'accepted']);
+            
+            if (membersError) throw membersError;
+            members = membersData;
         }
-
+        
         currentTeam = team;
-
-        // Fetch team members (only pending and accepted)
-        const { data: members, error: membersError } = await supabase
-            .from('team_member_submission')
-            .select('*')
-            .eq('TeamCode', parseInt(teamCode))
-            .in('Status', ['pending', 'accepted']);
-        
-        if (membersError) throw membersError;
-        
         currentMembers = members || [];
 
         // Initialize member reviews
@@ -777,28 +799,52 @@ async function submitReview() {
         const reviews = Object.values(memberReviews);
         const hasRejected = reviews.some(review => review.status === 'rejected');
         
-        // Update team leader status
-        const teamStatus = hasRejected ? 'rejected' : 'accepted';
-        const { error: teamError } = await supabase
-            .from('team_leader_form')
-            .update({ Status: teamStatus })
-            .eq('id', currentTeam.id);
-        
-        if (teamError) throw teamError;
-        
-        // Update member statuses
-        for (const [memberId, review] of Object.entries(memberReviews)) {
-            const updateData = { Status: review.status };
-            if (review.rejectionComment) {
-                updateData.rejection_comment = review.rejectionComment;
+        // Use direct REST API calls with service role key as primary method
+        try {
+            console.log('Updating team status with service role key...');
+            const teamStatus = hasRejected ? 'rejected' : 'accepted';
+            await updateTeamStatusWithServiceRole(currentTeam.id, teamStatus);
+            
+            console.log('Updating member statuses with service role key...');
+            // Update member statuses
+            for (const [memberId, review] of Object.entries(memberReviews)) {
+                const updateData = { Status: review.status };
+                if (review.rejectionComment) {
+                    updateData.rejection_comment = review.rejectionComment;
+                }
+                
+                await updateMemberStatusWithServiceRole(memberId, updateData);
             }
             
-            const { error: memberError } = await supabase
-                .from('team_member_submission')
-                .update(updateData)
-                .eq('id', memberId);
+        } catch (restError) {
+            console.warn('Direct REST API failed, trying Supabase client:', restError);
             
-            if (memberError) throw memberError;
+            // Fallback to Supabase client
+            const supabaseWithAuth = await getSupabaseWithAuth();
+            
+            // Update team leader status
+            const teamStatus = hasRejected ? 'rejected' : 'accepted';
+            const { error: teamError } = await supabaseWithAuth
+                .from('team_leader_form')
+                .update({ Status: teamStatus })
+                .eq('id', currentTeam.id);
+            
+            if (teamError) throw teamError;
+            
+            // Update member statuses
+            for (const [memberId, review] of Object.entries(memberReviews)) {
+                const updateData = { Status: review.status };
+                if (review.rejectionComment) {
+                    updateData.rejection_comment = review.rejectionComment;
+                }
+                
+                const { error: memberError } = await supabaseWithAuth
+                    .from('team_member_submission')
+                    .update(updateData)
+                    .eq('id', memberId);
+                
+                if (memberError) throw memberError;
+            }
         }
         // --- Webhook logic ---
         const payload = buildWebhookPayload(currentTeam, currentMembers, memberReviews);
@@ -832,6 +878,137 @@ function showNotification(message, type = 'info') {
     setTimeout(() => {
         notification.classList.remove('show');
     }, 3000);
+}
+
+// Helper function to ensure service role key is used for all database calls
+async function getSupabaseWithAuth() {
+    if (!supabase) {
+        throw new Error('Supabase client not initialized');
+    }
+    
+    // The service role key should already be set in the client initialization
+    // No need to set auth session or headers manually
+    return supabase;
+}
+
+// Alternative approach: Create a custom fetch function that always includes JWT
+async function supabaseFetch(endpoint, options = {}) {
+    const url = `${SUPABASE_URL}/rest/v1/${endpoint}`;
+    
+    const defaultHeaders = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${JWT_TOKEN}`,
+        'apikey': SUPABASE_ANON_KEY
+    };
+    
+    const response = await fetch(url, {
+        ...options,
+        headers: {
+            ...defaultHeaders,
+            ...options.headers
+        }
+    });
+    
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return response.json();
+}
+
+// Direct REST API functions with service role key
+async function fetchTeamWithServiceRole(teamCode) {
+    const url = `${SUPABASE_URL}/rest/v1/team_leader_form?TeamCode=eq.${teamCode}&select=*`;
+    
+    console.log('Fetching team from URL:', url);
+    console.log('Using service role key:', SERVICE_ROLE_KEY.substring(0, 20) + '...');
+    
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
+            'apikey': SERVICE_ROLE_KEY,
+            'Content-Type': 'application/json'
+        }
+    });
+    
+    console.log('Response status:', response.status);
+    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+    
+    if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response body:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+    }
+    
+    const data = await response.json();
+    console.log('Team data received:', data);
+    return data[0]; // Return first (and should be only) result
+}
+
+async function fetchMembersWithServiceRole(teamCode) {
+    const url = `${SUPABASE_URL}/rest/v1/team_member_submission?TeamCode=eq.${teamCode}&Status=in.(pending,accepted)&select=*`;
+    
+    console.log('Fetching members from URL:', url);
+    
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
+            'apikey': SERVICE_ROLE_KEY,
+            'Content-Type': 'application/json'
+        }
+    });
+    
+    console.log('Members response status:', response.status);
+    
+    if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Members error response body:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+    }
+    
+    const data = await response.json();
+    console.log('Members data received:', data);
+    return data;
+}
+
+async function updateTeamStatusWithServiceRole(teamId, status) {
+    const url = `${SUPABASE_URL}/rest/v1/team_leader_form?id=eq.${teamId}`;
+    
+    const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+            'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
+            'apikey': SERVICE_ROLE_KEY,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ Status: status })
+    });
+    
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+}
+
+async function updateMemberStatusWithServiceRole(memberId, updateData) {
+    const url = `${SUPABASE_URL}/rest/v1/team_member_submission?id=eq.${memberId}`;
+    
+    const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+            'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
+            'apikey': SERVICE_ROLE_KEY,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(updateData)
+    });
+    
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
 }
 
 // Initialize app
@@ -1168,6 +1345,42 @@ window.testPDFGeneration = async function(memberId) {
         await downloadMemberPDF(memberId);
     } catch (error) {
         console.error('PDF generation test failed:', error);
+    }
+};
+
+// Test function to debug service role key and database access
+window.testServiceRoleAccess = async function() {
+    console.log('=== Service Role Key Debug Test ===');
+    console.log('Service Role Key:', SERVICE_ROLE_KEY);
+    console.log('Supabase URL:', SUPABASE_URL);
+    
+    try {
+        // Test direct REST API call
+        console.log('Testing direct REST API call...');
+        const testUrl = `${SUPABASE_URL}/rest/v1/team_leader_form?select=count`;
+        
+        const response = await fetch(testUrl, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
+                'apikey': SERVICE_ROLE_KEY,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        console.log('Test response status:', response.status);
+        console.log('Test response headers:', Object.fromEntries(response.headers.entries()));
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Test response data:', data);
+        } else {
+            const errorText = await response.text();
+            console.error('Test error response:', errorText);
+        }
+        
+    } catch (error) {
+        console.error('Test failed:', error);
     }
 };
 

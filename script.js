@@ -14,6 +14,17 @@ let currentMembers = [];
 let currentMember = null;
 let memberReviews = {}; // Store member review status
 
+// Function to handle image loading errors
+function handleImageError(img, fallbackSrc) {
+    img.style.display = 'none';
+    console.log('Image failed to load:', img.src);
+}
+
+// Function to handle successful image loading
+function handleImageSuccess(img, src) {
+    console.log('Image loaded successfully:', src);
+}
+
 // DOM elements
 const teamCodeInput = document.getElementById('teamCodeInput');
 const loadTeamBtn = document.getElementById('loadTeamBtn');
@@ -424,27 +435,34 @@ async function showMemberDetails(memberId) {
     memberModal.style.display = 'block';
 }
 
-// Create member details HTML
+// Create member details HTML with organized photos but keeping original field sections
 function createMemberDetailsHTML(member) {
+    // Create images array
     const images = [];
-    
-    // Collect all 11 images (including empty ones)
     for (let i = 1; i <= 11; i++) {
         const imageUrl = member[`Image${i}`];
-        const imageComment = member[`Image${i}Comment`];
         const imageBB = member[`Image${i}BB`];
+        const imageComment = member[`Image${i}Comment`];
         
-        images.push({
-            url: imageUrl,
-            comment: imageComment,
-            imageBB: imageBB,
-            number: i,
-            hasImage: !!imageUrl,
-            hasComment: !!imageComment,
-            hasImageBB: !!imageBB
-        });
+        if (imageUrl || imageBB || imageComment) {
+            images.push({
+                number: i,
+                url: imageUrl,
+                imageBB: imageBB,
+                comment: imageComment,
+                hasImage: !!imageUrl,
+                hasImageBB: !!imageBB,
+                hasComment: !!imageComment
+            });
+        }
     }
-    
+
+    // Filter images by sections
+    const frontImages = images.filter(img => img.number <= 2);
+    const rightSleeveImages = images.filter(img => img.number >= 3 && img.number <= 6);
+    const leftSleeveImages = images.filter(img => img.number >= 7 && img.number <= 10);
+    const backImages = images.filter(img => img.number === 11);
+
     return `
         <div class="member-details-container">
             ${member.SubFolder ? `
@@ -467,7 +485,7 @@ function createMemberDetailsHTML(member) {
                 <div class="member-basic-info-grid">
                     <div class="info-item">
                         <label>الاسم:</label>
-                        <span>${member.Name || member.NameBehind || 'غير متوفر'}</span>
+                        <span>${member.NameBehind || member.Name || 'غير متوفر'}</span>
                     </div>
                     <div class="info-item">
                         <label>الهاتف:</label>
@@ -533,40 +551,117 @@ function createMemberDetailsHTML(member) {
                     </div>
                 </div>
             </div>
-            
-            <div class="member-images-section">
-                <h3>الصور والتعليقات</h3>
-                ${images.map(img => `
-                    <div class="image-item">
-                        <h4>الصورة ${img.number}</h4>
-                        <div class="image-container">
-                                                    ${img.hasImage ? `
-                            <div class="image-actions">
-                                <a href="${img.url}" target="_blank" class="btn btn-primary">
-                                    <i class="fas fa-external-link-alt"></i> الذهاب إلى Google Drive
-                                </a>
-                            </div>
-                        ` : `
-                            <div class="no-image">
-                                <i class="fas fa-image"></i>
-                                <span>لا توجد صورة</span>
-                            </div>
-                        `}
-                        </div>
-                        ${img.hasImageBB ? `
-                            <div class="image-preview-section">
-                                <h5>معاينة الصورة:</h5>
+
+            <!-- Section 1: Front Photos (1 & 2) -->
+            <div class="section">
+                <div class="section-header">
+                    <h3>الواجهة الأمامية (الصور 1-2)</h3>
+                </div>
+                <div class="photos-grid">
+                    ${frontImages.map(img => `
+                        <div class="photo-item">
+                            <h4>الصورة ${img.number}</h4>
+                            ${img.hasImageBB ? `
                                 <div class="image-preview-container">
-                                    <img src="${img.imageBB}" alt="معاينة صورة ${img.number}" onerror="handleImageError(this, '${img.imageBB}')" onload="handleImageSuccess(this, '${img.imageBB}')">
+                                    <img src="${img.imageBB}" alt="صورة ${img.number}" onerror="handleImageError(this, '${img.imageBB}')" onload="handleImageSuccess(this, '${img.imageBB}')" crossorigin="anonymous">
                                 </div>
+                            ` : `
+                                <div class="no-image">
+                                    <i class="fas fa-image"></i>
+                                    <span>لا توجد صورة</span>
+                                </div>
+                            `}
+                            <div class="image-comment">
+                                <strong>التعليق:</strong> 
+                                ${img.hasComment ? img.comment : 'لا يوجد تعليق'}
                             </div>
-                        ` : ''}
-                        <div class="image-comment">
-                            <strong>التعليق:</strong> 
-                            ${img.hasComment ? img.comment : 'لا يوجد تعليق'}
                         </div>
-                    </div>
-                `).join('')}
+                    `).join('')}
+                </div>
+            </div>
+
+            <!-- Section 2: Right Sleeves (Photos 3-6) -->
+            <div class="section">
+                <div class="section-header">
+                    <h3>الأكمام اليمنى (الصور 3-6)</h3>
+                </div>
+                <div class="photos-grid">
+                    ${rightSleeveImages.map(img => `
+                        <div class="photo-item">
+                            <h4>الصورة ${img.number}</h4>
+                            ${img.hasImageBB ? `
+                                <div class="image-preview-container">
+                                    <img src="${img.imageBB}" alt="صورة ${img.number}" onerror="handleImageError(this, '${img.imageBB}')" onload="handleImageSuccess(this, '${img.imageBB}')" crossorigin="anonymous">
+                                </div>
+                            ` : `
+                                <div class="no-image">
+                                    <i class="fas fa-image"></i>
+                                    <span>لا توجد صورة</span>
+                                </div>
+                            `}
+                            <div class="image-comment">
+                                <strong>التعليق:</strong> 
+                                ${img.hasComment ? img.comment : 'لا يوجد تعليق'}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+
+            <!-- Section 3: Left Sleeves (Photos 7-10) -->
+            <div class="section">
+                <div class="section-header">
+                    <h3>الأكمام اليسرى (الصور 7-10)</h3>
+                </div>
+                <div class="photos-grid">
+                    ${leftSleeveImages.map(img => `
+                        <div class="photo-item">
+                            <h4>الصورة ${img.number}</h4>
+                            ${img.hasImageBB ? `
+                                <div class="image-preview-container">
+                                    <img src="${img.imageBB}" alt="صورة ${img.number}" onerror="handleImageError(this, '${img.imageBB}')" onload="handleImageSuccess(this, '${img.imageBB}')" crossorigin="anonymous">
+                                </div>
+                            ` : `
+                                <div class="no-image">
+                                    <i class="fas fa-image"></i>
+                                    <span>لا توجد صورة</span>
+                                </div>
+                            `}
+                            <div class="image-comment">
+                                <strong>التعليق:</strong> 
+                                ${img.hasComment ? img.comment : 'لا يوجد تعليق'}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+
+            <!-- Section 4: Back (Photo 11) -->
+            <div class="section">
+                <div class="section-header">
+                    <h3>الظهر (الصورة 11)</h3>
+                </div>
+                <div class="photos-grid">
+                    ${backImages.map(img => `
+                        <div class="photo-item">
+                            <h4>الصورة ${img.number}</h4>
+                            ${img.hasImageBB ? `
+                                <div class="image-preview-container">
+                                    <img src="${img.imageBB}" alt="صورة ${img.number}" onerror="handleImageError(this, '${img.imageBB}')" onload="handleImageSuccess(this, '${img.imageBB}')" crossorigin="anonymous">
+                                </div>
+                            ` : `
+                                <div class="no-image">
+                                    <i class="fas fa-image"></i>
+                                    <span>لا توجد صورة</span>
+                                </div>
+                            `}
+                            <div class="image-comment">
+                                <strong>التعليق:</strong> 
+                                ${img.hasComment ? img.comment : 'لا يوجد تعليق'}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
             </div>
             
             ${member.InnerLinningTatreezImage ? `

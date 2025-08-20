@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تفاصيل العضو - PDF</title>
+    <title>Oji San - تفاصيل العضو</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -25,7 +25,7 @@
         }
 
         .modal-header {
-            background: #007bff;
+            background: linear-gradient(135deg, #DC94BC, #c47ba3);
             color: white;
             padding: 15px 20px;
             border-radius: 8px 8px 0 0;
@@ -37,6 +37,13 @@
         .modal-header h2 {
             margin: 0;
             font-size: 1.5rem;
+        }
+
+        .brand-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
         }
 
         .close {
@@ -51,29 +58,36 @@
             padding: 20px;
         }
 
-        .member-details-container {
+        .section {
             margin-bottom: 20px;
+            page-break-inside: avoid;
         }
 
-        .member-basic-info h3 {
-            color: #333;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+        .section-header {
+            background: linear-gradient(135deg, #DC94BC, #c47ba3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .section-header h3 {
+            margin: 0;
+            font-size: 1.3rem;
         }
 
         .member-basic-info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
         }
 
         .info-item {
             background: #f8f9fa;
             padding: 10px;
             border-radius: 5px;
-            border-right: 3px solid #007bff;
+            border-right: 3px solid #DC94BC;
         }
 
         .info-item label {
@@ -87,110 +101,74 @@
             color: #333;
         }
 
-        .member-images-section h3 {
-            color: #333;
-            border-bottom: 2px solid #28a745;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-
-        .image-item {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
+        .additions-section {
+            background: #fdf7fa;
+            border: 2px solid #DC94BC;
             border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-
-        .image-item h4 {
-            color: #007bff;
-            margin: 0 0 10px 0;
-        }
-
-        .image-container {
-            margin-bottom: 10px;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 8px 16px;
-            margin: 5px;
-            border: none;
-            border-radius: 4px;
-            text-decoration: none;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s;
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-
-        .btn-success {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background-color: #1e7e34;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background-color: #c82333;
-        }
-
-        .image-info {
-            background: #e9ecef;
-            padding: 8px 12px;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            text-align: center;
-            color: #495057;
-        }
-
-        .image-info span {
-            font-size: 14px;
-        }
-
-        .image-preview-section {
+            padding: 12px;
             margin: 10px 0;
         }
 
-        .image-preview-section h5 {
-            color: #555;
-            margin-bottom: 5px;
+        .additions-section h4 {
+            color: #c47ba3;
+            margin: 0 0 10px 0;
+            border-bottom: 1px solid #DC94BC;
+            padding-bottom: 5px;
+        }
+
+        .additions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 8px;
+        }
+
+        .addition-item {
+            background: white;
+            padding: 8px;
+            border-radius: 4px;
+            border-left: 3px solid #DC94BC;
+        }
+
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .photo-item {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .photo-item h4 {
+            color: #c47ba3;
+            margin: 0 0 10px 0;
+            text-align: center;
         }
 
         .image-preview-container {
             border: 1px solid #ddd;
             border-radius: 4px;
-            padding: 10px;
+            padding: 5px;
             background: white;
             text-align: center;
+            margin-bottom: 8px;
         }
 
         .image-preview-container img {
-            max-width: 200px;
-            max-height: 150px;
+            max-width: 100%;
+            max-height: 600px;
             border-radius: 4px;
         }
 
         .image-comment {
             background: #e9ecef;
-            padding: 10px;
+            padding: 8px;
             border-radius: 4px;
-            margin-top: 10px;
+            font-size: 0.9rem;
         }
 
         .no-image {
@@ -208,47 +186,34 @@
             display: block;
         }
 
-        .member-folder-section,
-        .member-actions-section {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #dee2e6;
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
         }
 
-        .member-folder-section h3 {
-            color: #333;
-            border-bottom: 2px solid #ffc107;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+        .btn-primary {
+            background-color: #DC94BC;
+            color: white;
         }
 
-        .folder-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
+        .btn-primary:hover {
+            background-color: #c47ba3;
         }
 
-        .folder-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .btn-success {
+            background-color: #28a745;
+            color: white;
         }
 
-        .folder-info i {
-            color: #ffc107;
-            font-size: 1.2rem;
-        }
-
-        .modal-footer {
-            background: #f8f9fa;
-            padding: 15px 20px;
-            border-radius: 0 0 8px 8px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
+        .btn-success:hover {
+            background-color: #1e7e34;
         }
 
         .download-controls {
@@ -275,51 +240,26 @@
                 box-shadow: none;
                 margin: 0;
                 max-width: none;
-                page-break-inside: avoid;
             }
             
-            /* Ensure no page breaks within content */
-            .member-details-container,
-            .member-basic-info,
-            .member-images-section,
-            .member-tatreez-section,
-            .image-item,
-            .member-basic-info-grid,
-            .info-item {
+            .section {
                 page-break-inside: avoid;
                 break-inside: avoid;
             }
             
-            /* Prevent page breaks between sections */
-            h3 {
+            .section-header {
                 page-break-after: avoid;
                 break-after: avoid;
             }
             
-            /* Ensure images don't break across pages */
-            .image-preview-container,
-            .image-container {
+            .photos-grid {
                 page-break-inside: avoid;
                 break-inside: avoid;
             }
             
-            /* Set page size to accommodate long content */
             @page {
                 size: A4;
                 margin: 10mm;
-            }
-            
-            /* Force single page layout */
-            body {
-                height: auto !important;
-                overflow: visible !important;
-            }
-            
-            .modal-content {
-                height: auto !important;
-                overflow: visible !important;
-                page-break-after: avoid;
-                break-after: avoid;
             }
         }
 
@@ -333,6 +273,88 @@
             font-size: 3rem;
             margin-bottom: 20px;
             display: block;
+        }
+
+        /* All Images Summary Page Styles */
+        .all-images-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .image-category {
+            background: #f8f9fa;
+            border: 2px solid #DC94BC;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .category-title {
+            color: #c47ba3;
+            margin: 0 0 15px 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 2px solid #DC94BC;
+            padding-bottom: 8px;
+        }
+
+        .images-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            justify-items: center;
+        }
+
+        .image-slot {
+            width: 150px;
+            height: 150px;
+            border: 2px dashed #DC94BC;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-slot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .image-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #DC94BC;
+            text-align: center;
+        }
+
+        .image-placeholder i {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .image-placeholder span {
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .image-number {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(220, 148, 188, 0.9);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -349,7 +371,10 @@
 
     <div class="modal-content" id="memberModal">
         <div class="modal-header">
-            <h2 id="memberModalTitle">تفاصيل العضو</h2>
+            <div>
+                <div class="brand-title">أوجي سان</div>
+                <h2 id="memberModalTitle">تفاصيل العضو</h2>
+            </div>
             <span class="close" onclick="window.close()">×</span>
         </div>
         <div class="modal-body">
@@ -357,6 +382,108 @@
                 <div class="loading">
                     <i class="fas fa-spinner fa-spin"></i>
                     <p>جاري تحميل تفاصيل العضو...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- All Images Summary Page -->
+    <div id="allImagesPage" class="section" style="display: none;">
+        <div class="section-header">
+            <h3>ملخص جميع الصور</h3>
+        </div>
+        <div class="all-images-grid">
+            <!-- Front Images (1-2) -->
+            <div class="image-category">
+                <h4 class="category-title">الواجهة الأمامية</h4>
+                <div class="images-row">
+                    <div class="image-slot" id="front-image-1">
+                        <div class="image-placeholder">
+                            <i class="fas fa-image"></i>
+                            <span>الصورة 1</span>
+                        </div>
+                    </div>
+                    <div class="image-slot" id="front-image-2">
+                        <div class="image-placeholder">
+                            <i class="fas fa-image"></i>
+                            <span>الصورة 2</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sleeve Images (3-6) -->
+            <div class="image-category">
+                <h4 class="category-title">الأكمام اليمنى</h4>
+                <div class="images-row">
+                    <div class="image-slot" id="right-image-3">
+                        <div class="image-placeholder">
+                            <i class="fas fa-image"></i>
+                            <span>الصورة 3</span>
+                        </div>
+                    </div>
+                    <div class="image-slot" id="right-image-4">
+                        <div class="image-placeholder">
+                            <i class="fas fa-image"></i>
+                            <span>الصورة 4</span>
+                        </div>
+                    </div>
+                    <div class="image-slot" id="right-image-5">
+                        <div class="image-placeholder">
+                            <i class="fas fa-image"></i>
+                            <span>الصورة 5</span>
+                        </div>
+                    </div>
+                    <div class="image-slot" id="right-image-6">
+                        <div class="image-placeholder">
+                            <i class="fas fa-image"></i>
+                            <span>الصورة 6</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Left Sleeve Images (7-10) -->
+            <div class="image-category">
+                <h4 class="category-title">الأكمام اليسرى</h4>
+                <div class="images-row">
+                    <div class="image-slot" id="left-image-7">
+                        <div class="image-placeholder">
+                            <i class="fas fa-image"></i>
+                            <span>الصورة 7</span>
+                        </div>
+                    </div>
+                    <div class="image-slot" id="left-image-8">
+                        <div class="image-placeholder">
+                            <i class="fas fa-image"></i>
+                            <span>الصورة 8</span>
+                        </div>
+                    </div>
+                    <div class="image-slot" id="left-image-9">
+                        <div class="image-placeholder">
+                            <i class="fas fa-image"></i>
+                            <span>الصورة 9</span>
+                        </div>
+                    </div>
+                    <div class="image-slot" id="left-image-10">
+                        <div class="image-placeholder">
+                            <i class="fas fa-image"></i>
+                            <span>الصورة 10</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Back Image (11) -->
+            <div class="image-category">
+                <h4 class="category-title">الظهر</h4>
+                <div class="images-row">
+                    <div class="image-slot" id="back-image-11">
+                        <div class="image-placeholder">
+                            <i class="fas fa-image"></i>
+                            <span>الصورة 11</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -374,7 +501,7 @@
             console.log('Image loaded successfully:', src);
         }
 
-        // Function to create member details HTML
+        // Function to create member details HTML with new structure
         function createMemberDetailsHTML(member) {
             // Create images array
             const images = [];
@@ -396,19 +523,27 @@
                 }
             }
 
+            // Filter images by sections
+            const frontImages = images.filter(img => img.number <= 2);
+            const rightSleeveImages = images.filter(img => img.number >= 3 && img.number <= 6);
+            const leftSleeveImages = images.filter(img => img.number >= 7 && img.number <= 10);
+            const backImages = images.filter(img => img.number === 11);
+
             return `
                 <div class="member-details-container">
-                    <div class="member-basic-info">
-                        <h3>المعلومات الأساسية</h3>
+                    <!-- Section 1: Basic Info + Additions + Front Photos -->
+                    <div class="section">
+                        <div class="section-header">
+                            <h3>المعلومات الأساسية والاضافات والواجهة الأمامية</h3>
+                        </div>
+                        
+                        <!-- Basic Info -->
                         <div class="member-basic-info-grid">
                             <div class="info-item">
                                 <label>الاسم:</label>
-                                <span>${member.Name || member.NameBehind || 'غير متوفر'}</span>
+                                <span>${member.NameBehind || member.Name || 'غير متوفر'}</span>
                             </div>
-                            <div class="info-item">
-                                <label>الهاتف:</label>
-                                <span>${member.Phone || 'غير متوفر'}</span>
-                            </div>
+                           
                             <div class="info-item">
                                 <label>المقاس:</label>
                                 <span>${member.Size || 'غير متوفر'}</span>
@@ -429,92 +564,200 @@
                                 <label>نوع الأكمام:</label>
                                 <span>${member.SleeveType || 'غير متوفر'}</span>
                             </div>
-                            <div class="info-item">
-                                <label>الجيب المخفي:</label>
-                                <span>${member.HiddenPocket || 'غير متوفر'}</span>
-                            </div>
-                            <div class="info-item">
-                                <label>البطانة الداخلية:</label>
-                                <span>${member.InnerLining || 'غير متوفر'}</span>
-                            </div>
-                            <div class="info-item">
-                                <label>تعليق البطانة:</label>
-                                <span>${member.InnerlinningComment || 'غير متوفر'}</span>
-                            </div>
-                            <div class="info-item">
-                                <label>تطريز البطانة:</label>
-                                <span>${member.InnerLinningTatreez || 'غير متوفر'}</span>
-                            </div>
-                            <div class="info-item">
-                                <label>تعليق تطريز البطانة:</label>
-                                <span>${member.InnerLinningTatreezComment || 'غير متوفر'}</span>
-                            </div>
-                            <div class="info-item">
-                                <label>القبعة الثابتة:</label>
-                                <span>${member.FixedCap || 'غير متوفر'}</span>
-                            </div>
-                            <div class="info-item">
-                                <label>السترة كاملة الجلد:</label>
-                                <span>${member.JacketFullLeather || 'غير متوفر'}</span>
-                            </div>
-                            <div class="info-item">
-                                <label>السعر النهائي:</label>
-                                <span>${member.FinalPrice || 'غير متوفر'}</span>
+                             <div class="info-item">
+                                <label>الهاتف:</label>
+                                <span>${member.Phone || 'غير متوفر'}</span>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="member-images-section">
-                        <h3>الصور والتعليقات</h3>
-                        ${images.map(img => `
-                            <div class="image-item">
-                                <h4>الصورة ${img.number}</h4>
-                                <div class="image-container">
-                                    ${img.hasImage ? `
-                                        <!-- Google Drive link available but not shown in PDF -->
+
+                        <!-- Additions Section -->
+                        <div class="additions-section">
+                            <h4>الاضافات</h4>
+                            <div class="additions-grid">
+                                <div class="addition-item">
+                                    <label>القبعة الثابتة:</label>
+                                    <span>${member.FixedCap || 'غير متوفر'}</span>
+                                </div>
+                                <div class="addition-item">
+                                    <label>تطريز البطانة:</label>
+                                    <span>${member.InnerLinningTatreez || 'غير متوفر'}</span>
+                                </div>
+                                <div class="addition-item">
+                                    <label>تعليق التطريز:</label>
+                                    <span>${member.InnerLinningTatreezComment || 'غير متوفر'}</span>
+                                </div>
+                            </div>
+                            
+                            ${member.InnerLinningTatreezImageBB ? `
+                                <div style="margin-top: 15px;">
+                                    <h5>صورة تطريز البطانة:</h5>
+                                    <div class="image-preview-container">
+                                        <img src="${member.InnerLinningTatreezImageBB}" alt="صورة تطريز البطانة" onerror="handleImageError(this, '${member.InnerLinningTatreezImageBB}')" onload="handleImageSuccess(this, '${member.InnerLinningTatreezImageBB}')" crossorigin="anonymous">
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <!-- Front Photos (1 & 2) -->
+                        <div class="photos-grid">
+                            ${frontImages.map(img => `
+                                <div class="photo-item">
+                                    <h4>الصورة ${img.number}</h4>
+                                    ${img.hasImageBB ? `
+                                        <div class="image-preview-container">
+                                            <img src="${img.imageBB}" alt="صورة ${img.number}" onerror="handleImageError(this, '${img.imageBB}')" onload="handleImageSuccess(this, '${img.imageBB}')" crossorigin="anonymous">
+                                        </div>
                                     ` : `
                                         <div class="no-image">
                                             <i class="fas fa-image"></i>
                                             <span>لا توجد صورة</span>
                                         </div>
                                     `}
-                                </div>
-                                ${img.hasImageBB ? `
-                                    <div class="image-preview-section">
-                                        <h5>معاينة الصورة:</h5>
-                                        <div class="image-preview-container">
-                                            <img src="${img.imageBB}" alt="معاينة صورة ${img.number}" onerror="handleImageError(this, '${img.imageBB}')" onload="handleImageSuccess(this, '${img.imageBB}')" crossorigin="anonymous">
-                                        </div>
+                                    <div class="image-comment">
+                                        <strong>التعليق:</strong> 
+                                        ${img.hasComment ? img.comment : 'لا يوجد تعليق'}
                                     </div>
-                                ` : ''}
-                                <div class="image-comment">
-                                    <strong>التعليق:</strong> 
-                                    ${img.hasComment ? img.comment : 'لا يوجد تعليق'}
                                 </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                    
-                    ${member.InnerLinningTatreezImage ? `
-                    <div class="member-tatreez-section">
-                        <h3>صورة تطريز البطانة</h3>
-                        <div class="tatreez-image-container">
-                            <!-- Google Drive link available but not shown in PDF -->
+                            `).join('')}
                         </div>
-                        ${member.InnerLinningTatreezImageBB ? `
-                            <div class="image-preview-section">
-                                <h5>معاينة صورة تطريز البطانة:</h5>
-                                <div class="image-preview-container">
-                                    <img src="${member.InnerLinningTatreezImageBB}" alt="معاينة صورة تطريز البطانة" onerror="handleImageError(this, '${member.InnerLinningTatreezImageBB}')" onload="handleImageSuccess(this, '${member.InnerLinningTatreezImageBB}')" crossorigin="anonymous">
-                                </div>
-                            </div>
-                        ` : ''}
                     </div>
-                    ` : ''}
-                    
 
+                    <!-- Section 2: Right Sleeves (Photos 3-6) -->
+                    <div class="section">
+                        <div class="section-header">
+                            <h3>الأكمام اليمنى (الصور 3-6)</h3>
+                        </div>
+                        <div class="photos-grid">
+                            ${rightSleeveImages.map(img => `
+                                <div class="photo-item">
+                                    <h4>الصورة ${img.number}</h4>
+                                    ${img.hasImageBB ? `
+                                        <div class="image-preview-container">
+                                            <img src="${img.imageBB}" alt="صورة ${img.number}" onerror="handleImageError(this, '${img.imageBB}')" onload="handleImageSuccess(this, '${img.imageBB}')" crossorigin="anonymous">
+                                        </div>
+                                    ` : `
+                                        <div class="no-image">
+                                            <i class="fas fa-image"></i>
+                                            <span>لا توجد صورة</span>
+                                        </div>
+                                    `}
+                                    <div class="image-comment">
+                                        <strong>التعليق:</strong> 
+                                        ${img.hasComment ? img.comment : 'لا يوجد تعليق'}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Left Sleeves (Photos 7-10) -->
+                    <div class="section">
+                        <div class="section-header">
+                            <h3>الأكمام اليسرى (الصور 7-10)</h3>
+                        </div>
+                        <div class="photos-grid">
+                            ${leftSleeveImages.map(img => `
+                                <div class="photo-item">
+                                    <h4>الصورة ${img.number}</h4>
+                                    ${img.hasImageBB ? `
+                                        <div class="image-preview-container">
+                                            <img src="${img.imageBB}" alt="صورة ${img.number}" onerror="handleImageError(this, '${img.imageBB}')" onload="handleImageSuccess(this, '${img.imageBB}')" crossorigin="anonymous">
+                                        </div>
+                                    ` : `
+                                        <div class="no-image">
+                                            <i class="fas fa-image"></i>
+                                            <span>لا توجد صورة</span>
+                                        </div>
+                                    `}
+                                    <div class="image-comment">
+                                        <strong>التعليق:</strong> 
+                                        ${img.hasComment ? img.comment : 'لا يوجد تعليق'}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Section 4: Back (Photo 11) -->
+                    <div class="section">
+                        <div class="section-header">
+                            <h3>الظهر (الصورة 11)</h3>
+                        </div>
+                        <div class="photos-grid">
+                            ${backImages.map(img => `
+                                <div class="photo-item">
+                                    <h4>الصورة ${img.number}</h4>
+                                    ${img.hasImageBB ? `
+                                        <div class="image-preview-container">
+                                            <img src="${img.imageBB}" alt="صورة ${img.number}" onerror="handleImageError(this, '${img.imageBB}')" onload="handleImageSuccess(this, '${img.imageBB}')" crossorigin="anonymous">
+                                        </div>
+                                    ` : `
+                                        <div class="no-image">
+                                            <i class="fas fa-image"></i>
+                                            <span>لا توجد صورة</span>
+                                        </div>
+                                    `}
+                                    <div class="image-comment">
+                                        <strong>التعليق:</strong> 
+                                        ${img.hasComment ? img.comment : 'لا يوجد تعليق'}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
                 </div>
             `;
+        }
+
+        // Populate all images summary page
+        function populateAllImagesPage(member) {
+            // Show the all images page
+            document.getElementById('allImagesPage').style.display = 'block';
+            
+            // Populate images for each category
+            for (let i = 1; i <= 11; i++) {
+                const imageBB = member[`Image${i}BB`];
+                const imageSlot = document.getElementById(getImageSlotId(i));
+                
+                if (imageSlot && imageBB) {
+                    // Create image element
+                    const img = document.createElement('img');
+                    img.src = imageBB;
+                    img.alt = `صورة ${i}`;
+                    img.onerror = function() {
+                        // If image fails to load, show placeholder
+                        imageSlot.innerHTML = `
+                            <div class="image-placeholder">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>خطأ في التحميل</span>
+                            </div>
+                        `;
+                    };
+                    
+                    // Add image number badge
+                    const numberBadge = document.createElement('div');
+                    numberBadge.className = 'image-number';
+                    numberBadge.textContent = i;
+                    
+                    // Clear slot and add image
+                    imageSlot.innerHTML = '';
+                    imageSlot.appendChild(img);
+                    imageSlot.appendChild(numberBadge);
+                }
+            }
+        }
+
+        // Helper function to get image slot ID based on image number
+        function getImageSlotId(imageNumber) {
+            if (imageNumber <= 2) {
+                return `front-image-${imageNumber}`;
+            } else if (imageNumber <= 6) {
+                return `right-image-${imageNumber}`;
+            } else if (imageNumber <= 10) {
+                return `left-image-${imageNumber}`;
+            } else {
+                return `back-image-${imageNumber}`;
+            }
         }
 
         // Load member data from localStorage using dataId from URL, with fallback to URL parameters
@@ -534,10 +777,13 @@
                         console.log('Member data loaded from localStorage:', member);
                         
                         // Update modal title
-                        document.getElementById('memberModalTitle').textContent = `تفاصيل العضو - ${member.Name || member.NameBehind || 'غير معروف'}`;
+                        document.getElementById('memberModalTitle').textContent = `تفاصيل العضو - ${member.NameBehind || member.Name || 'غير معروف'}`;
                         
                         // Load member details
                         document.getElementById('memberDetails').innerHTML = createMemberDetailsHTML(member);
+                        
+                        // Populate all images page
+                        populateAllImagesPage(member);
                         
                         // Clean up the data from localStorage after loading
                         localStorage.removeItem(dataId);
@@ -568,10 +814,13 @@
                     console.log('Member data loaded from URL parameters:', member);
                     
                     // Update modal title
-                    document.getElementById('memberModalTitle').textContent = `تفاصيل العضو - ${member.Name || member.NameBehind || 'غير معروف'}`;
+                    document.getElementById('memberModalTitle').textContent = `تفاصيل العضو - ${member.NameBehind || member.Name || 'غير معروف'}`;
                     
                     // Load member details
                     document.getElementById('memberDetails').innerHTML = createMemberDetailsHTML(member);
+                    
+                    // Populate all images page
+                    populateAllImagesPage(member);
                     
                     // Wait for images to load
                     setTimeout(() => {
@@ -598,7 +847,7 @@
             }
         }
 
-        // Basic PDF download function - Single long page
+        // Basic PDF download function - Multi-page
         async function downloadMemberPDF() {
             try {
                 // Show loading indicator
@@ -616,43 +865,86 @@
                     downloadControls.style.display = 'none';
                 }
 
-                // Convert HTML to canvas
-                const canvas = await html2canvas(element, {
-                    scale: 2, // Higher quality
-                    useCORS: true, // Allow cross-origin images
-                    allowTaint: true,
-                    backgroundColor: '#ffffff',
-                    width: element.scrollWidth,
-                    height: element.scrollHeight,
-                    scrollX: 0,
-                    scrollY: 0
+                // Create PDF
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
                 });
+
+                // Get all sections from the main modal
+                const sections = element.querySelectorAll('.section');
+                let currentY = 20; // Starting Y position
+                const pageHeight = 277; // A4 height minus margins
+                const margin = 10;
+
+                // Process main sections
+                for (let i = 0; i < sections.length; i++) {
+                    const section = sections[i];
+                    
+                    // Convert section to canvas
+                    const canvas = await html2canvas(section, {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        backgroundColor: '#ffffff',
+                        width: section.scrollWidth,
+                        height: section.scrollHeight,
+                        scrollX: 0,
+                        scrollY: 0
+                    });
+
+                    // Calculate dimensions
+                    const imgWidth = 190; // A4 width minus margins
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                    // Check if we need a new page
+                    if (currentY + imgHeight > pageHeight) {
+                        pdf.addPage();
+                        currentY = 20;
+                    }
+
+                    // Add section to PDF
+                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, currentY, imgWidth, imgHeight);
+                    currentY += imgHeight + 10; // Add some spacing between sections
+                }
+
+                // Add all images summary page
+                const allImagesPage = document.getElementById('allImagesPage');
+                if (allImagesPage && allImagesPage.style.display !== 'none') {
+                    // Add a new page for the all images summary
+                    pdf.addPage();
+                    currentY = 20;
+
+                    // Convert all images page to canvas
+                    const allImagesCanvas = await html2canvas(allImagesPage, {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        backgroundColor: '#ffffff',
+                        width: allImagesPage.scrollWidth,
+                        height: allImagesPage.scrollHeight,
+                        scrollX: 0,
+                        scrollY: 0
+                    });
+
+                    // Calculate dimensions for all images page
+                    const allImagesWidth = 190;
+                    const allImagesHeight = (allImagesCanvas.height * allImagesWidth) / allImagesCanvas.width;
+
+                    // Add all images page to PDF
+                    pdf.addImage(allImagesCanvas.toDataURL('image/png'), 'PNG', margin, currentY, allImagesWidth, allImagesHeight);
+                }
 
                 // Show the download controls again
                 if (downloadControls) {
                     downloadControls.style.display = 'block';
                 }
 
-                // Create PDF with custom page size for single long page
-                const { jsPDF } = window.jspdf;
-                
-                // Calculate custom page size based on content
-                const imgWidth = 210; // A4 width in mm
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                const customPageHeight = Math.max(imgHeight, 297); // At least A4 height
-                
-                const pdf = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'mm',
-                    format: [210, customPageHeight] // Custom size for single long page
-                });
-
-                // Add the entire content as a single image
-                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, imgWidth, imgHeight);
-
                 // Download the PDF
                 const memberName = document.querySelector('.info-item span').textContent || 'member';
-                pdf.save(`تفاصيل_العضو_${memberName}_${new Date().toISOString().split('T')[0]}.pdf`);
+                pdf.save(`أوجي_سان_تفاصيل_العضو_${memberName}_${new Date().toISOString().split('T')[0]}.pdf`);
 
                 // Restore button
                 originalButton.innerHTML = originalText;
@@ -669,7 +961,7 @@
             }
         }
 
-        // High quality PDF download function - Single long page
+        // High quality PDF download function - Multi-page
         async function downloadMemberPDFHighQuality() {
             try {
                 // Show loading indicator
@@ -687,47 +979,93 @@
                     downloadControls.style.display = 'none';
                 }
 
-                // Convert HTML to canvas with higher quality
-                const canvas = await html2canvas(element, {
-                    scale: 3, // Higher quality
-                    useCORS: true,
-                    allowTaint: true,
-                    backgroundColor: '#ffffff',
-                    width: element.scrollWidth,
-                    height: element.scrollHeight,
-                    scrollX: 0,
-                    scrollY: 0,
-                    logging: false,
-                    imageTimeout: 15000, // Wait longer for images
-                    removeContainer: true
+                // Create PDF
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4',
+                    compress: true
                 });
+
+                // Get all sections from the main modal
+                const sections = element.querySelectorAll('.section');
+                let currentY = 20; // Starting Y position
+                const pageHeight = 277; // A4 height minus margins
+                const margin = 10;
+
+                // Process main sections
+                for (let i = 0; i < sections.length; i++) {
+                    const section = sections[i];
+                    
+                    // Convert section to canvas with higher quality
+                    const canvas = await html2canvas(section, {
+                        scale: 3, // Higher quality
+                        useCORS: true,
+                        allowTaint: true,
+                        backgroundColor: '#ffffff',
+                        width: section.scrollWidth,
+                        height: section.scrollHeight,
+                        scrollX: 0,
+                        scrollY: 0,
+                        logging: false,
+                        imageTimeout: 15000, // Wait longer for images
+                        removeContainer: true
+                    });
+
+                    // Calculate dimensions
+                    const imgWidth = 190; // A4 width minus margins
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                    // Check if we need a new page
+                    if (currentY + imgHeight > pageHeight) {
+                        pdf.addPage();
+                        currentY = 20;
+                    }
+
+                    // Add section to PDF with high quality
+                    pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, currentY, imgWidth, imgHeight);
+                    currentY += imgHeight + 10; // Add some spacing between sections
+                }
+
+                // Add all images summary page
+                const allImagesPage = document.getElementById('allImagesPage');
+                if (allImagesPage && allImagesPage.style.display !== 'none') {
+                    // Add a new page for the all images summary
+                    pdf.addPage();
+                    currentY = 20;
+
+                    // Convert all images page to canvas with high quality
+                    const allImagesCanvas = await html2canvas(allImagesPage, {
+                        scale: 3, // Higher quality
+                        useCORS: true,
+                        allowTaint: true,
+                        backgroundColor: '#ffffff',
+                        width: allImagesPage.scrollWidth,
+                        height: allImagesPage.scrollHeight,
+                        scrollX: 0,
+                        scrollY: 0,
+                        logging: false,
+                        imageTimeout: 15000, // Wait longer for images
+                        removeContainer: true
+                    });
+
+                    // Calculate dimensions for all images page
+                    const allImagesWidth = 190;
+                    const allImagesHeight = (allImagesCanvas.height * allImagesWidth) / allImagesCanvas.width;
+
+                    // Add all images page to PDF with high quality
+                    pdf.addImage(allImagesCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, currentY, allImagesWidth, allImagesHeight);
+                }
 
                 // Show the download controls again
                 if (downloadControls) {
                     downloadControls.style.display = 'block';
                 }
 
-                // Create PDF with custom page size for single long page
-                const { jsPDF } = window.jspdf;
-                
-                // Calculate custom page size based on content
-                const imgWidth = 190; // A4 width minus margins in mm
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                const customPageHeight = Math.max(imgHeight, 297); // At least A4 height
-                
-                const pdf = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'mm',
-                    format: [210, customPageHeight], // Custom size for single long page
-                    compress: true
-                });
-
-                // Add the entire content as a single image with margins
-                pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 10, 10, imgWidth, imgHeight);
-
                 // Download the PDF
                 const memberName = document.querySelector('.info-item span').textContent || 'member';
-                pdf.save(`تفاصيل_العضو_${memberName}_جودة_عالية_${new Date().toISOString().split('T')[0]}.pdf`);
+                pdf.save(`أوجي_سان_تفاصيل_العضو_${memberName}_جودة_عالية_${new Date().toISOString().split('T')[0]}.pdf`);
 
                 // Restore button
                 originalButton.innerHTML = originalText;

@@ -490,6 +490,10 @@
     </div>
 
     <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://pxapeabojeqcwrcfaunx.supabase.co';
+        const SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4YXBlYWJvamVxY3dyY2ZhdW54Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0OTkwNTUyNywiZXhwIjoyMDY1NDgxNTI3fQ.y4LrbiXtJw9pDTBgU0EJZLc0nw6yRx_sVQb0fcRNBe0';
+
         // Function to handle image loading errors
         function handleImageError(img, fallbackSrc) {
             img.style.display = 'none';
@@ -760,13 +764,95 @@
             }
         }
 
+        // Fetch member data from Supabase by ID
+        async function fetchMemberFromSupabase(memberId) {
+            try {
+                console.log('Fetching member data from Supabase for ID:', memberId);
+                
+                const url = `${SUPABASE_URL}/rest/v1/team_member_submission?id=eq.${memberId}&select=*`;
+                console.log('Fetching from URL:', url);
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
+                        'apikey': SERVICE_ROLE_KEY,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Supabase response:', data);
+
+                if (data && data.length > 0) {
+                    return data[0]; // Return the first (and should be only) member
+                } else {
+                    throw new Error('No member found with this ID');
+                }
+            } catch (error) {
+                console.error('Error fetching member from Supabase:', error);
+                throw error;
+            }
+        }
+
         // Load member data from localStorage using dataId from URL, with fallback to URL parameters
-        function loadMemberData() {
+        async function loadMemberData() {
             const urlParams = new URLSearchParams(window.location.search);
             const dataId = urlParams.get('dataId');
             const memberData = urlParams.get('member');
+            const memberId = urlParams.get('memberId');
             
-            if (dataId) {
+            // Priority 1: Fetch from Supabase by memberId
+            if (memberId) {
+                try {
+                    console.log('Loading member data from Supabase with ID:', memberId);
+                    
+                    // Show loading state
+                    document.getElementById('memberDetails').innerHTML = `
+                        <div class="loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>جاري تحميل بيانات العضو من قاعدة البيانات...</p>
+                        </div>
+                    `;
+                    
+                    // Fetch member data from Supabase
+                    const member = await fetchMemberFromSupabase(memberId);
+                    
+                    console.log('Member data loaded from Supabase:', member);
+                    
+                    // Update modal title
+                    document.getElementById('memberModalTitle').textContent = `تفاصيل العضو - ${member.NameBehind || member.Name || 'غير معروف'}`;
+                    
+                    // Load member details
+                    document.getElementById('memberDetails').innerHTML = createMemberDetailsHTML(member);
+                    
+                    // Populate all images page
+                    populateAllImagesPage(member);
+                    
+                    // Wait for images to load
+                    setTimeout(() => {
+                        const images = document.querySelectorAll('img');
+                        console.log(`Found ${images.length} images to load`);
+                    }, 1000);
+                    
+                } catch (error) {
+                    console.error('Error loading member data from Supabase:', error);
+                    document.getElementById('memberDetails').innerHTML = `
+                        <div class="loading">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>حدث خطأ في تحميل بيانات العضو من قاعدة البيانات: ${error.message}</p>
+                        </div>
+                    `;
+                }
+            }
+            // Priority 2: Load from localStorage using dataId
+            else if (dataId) {
                 try {
                     // Get member data from localStorage
                     const storedData = localStorage.getItem(dataId);
@@ -807,7 +893,9 @@
                         </div>
                     `;
                 }
-            } else if (memberData) {
+            }
+            // Priority 3: Load from URL parameters
+            else if (memberData) {
                 // Fallback: try to load from URL parameters
                 try {
                     const member = JSON.parse(decodeURIComponent(memberData));
@@ -837,14 +925,15 @@
                         </div>
                     `;
                 }
-            } else {
-                document.getElementById('memberDetails').innerHTML = `
-                    <div class="loading">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>لم يتم العثور على بيانات العضو</p>
-                    </div>
-                `;
-            }
+                             } else {
+                     document.getElementById('memberDetails').innerHTML = `
+                         <div class="loading">
+                             <i class="fas fa-exclamation-triangle"></i>
+                             <p>لم يتم العثور على بيانات العضو. يرجى التأكد من وجود معامل memberId أو dataId أو member في الرابط.</p>
+                             <p>مثال: ?memberId=65 أو ?dataId=abc123</p>
+                         </div>
+                     `;
+                 }
         }
 
         // Basic PDF download function - Multi-page

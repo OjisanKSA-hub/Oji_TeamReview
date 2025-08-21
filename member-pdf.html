@@ -66,14 +66,35 @@
         .section-header {
             background: linear-gradient(135deg, #DC94BC, #c47ba3);
             color: white;
-            padding: 10px 20px;
+            padding: 8px 14px;
             border-radius: 8px;
             margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .section-header h3 {
             margin: 0;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
+            line-height: 1.25;
+        }
+
+        /* Small circular preview in section headers */
+        .section-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.85);
+            overflow: hidden;
+            background: #fff;
+            flex: 0 0 auto;
+        }
+        .section-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
         .member-basic-info-grid {
@@ -129,6 +150,30 @@
             border-left: 3px solid #DC94BC;
         }
 
+        /* Additions layout: details + image side by side */
+        .additions-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 12px;
+            align-items: start;
+        }
+        .additions-left .additions-grid { margin-bottom: 10px; }
+        .addition-comment-block { margin-top: 8px; }
+        @media (max-width: 768px) {
+            .additions-layout { grid-template-columns: 1fr; }
+        }
+
+        /* Layout to place basic info and additions side by side */
+        .basic-additions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            align-items: start;
+        }
+        @media (max-width: 900px) {
+            .basic-additions { grid-template-columns: 1fr; }
+        }
+
         .photos-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -162,6 +207,11 @@
             max-width: 100%;
             max-height: 600px;
             border-radius: 4px;
+        }
+
+        /* Slightly smaller images for front section to better fit page */
+        .front-photos .image-preview-container img {
+            max-height: 500px;
         }
 
         .image-comment {
@@ -256,11 +306,44 @@
                 page-break-inside: avoid;
                 break-inside: avoid;
             }
+
+            /* Even smaller for print to fit page */
+            .front-photos .image-preview-container img {
+                max-height: 420px;
+            }
             
             @page {
                 size: A4;
                 margin: 10mm;
             }
+            
+                         /* Add page header with company name */
+             .section::before {
+                 content: "أوجي سان";
+                 display: block;
+                 text-align: center;
+                 font-size: 18px;
+                 font-weight: bold;
+                 color: #DC94BC;
+                 margin-bottom: 10px;
+                 border-bottom: 2px solid #DC94BC;
+                 padding-bottom: 5px;
+                 page-break-after: avoid;
+                 break-after: avoid;
+             }
+             
+             /* Also add to modal header for consistency */
+             .modal-header::before {
+                 content: "أوجي سان";
+                 display: block;
+                 text-align: center;
+                 font-size: 16px;
+                 font-weight: bold;
+                 color: white;
+                 margin-bottom: 5px;
+                 border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+                 padding-bottom: 3px;
+             }
         }
 
         .loading {
@@ -326,6 +409,76 @@
             border-radius: 6px;
         }
 
+        /* All 11 Images in 3 Columns for A4 - Much larger size */
+        .all-images-single-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+            width: 90%;
+        }
+
+        /* Card styling for all images page */
+        #allImagesPage {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            margin: 20px auto;
+            overflow: hidden;
+        }
+
+        #allImagesPage .section-header {
+            background: linear-gradient(135deg, #DC94BC, #c47ba3);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 0;
+            margin-bottom: 0;
+        }
+
+        #allImagesPage .section-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        /* Add padding to the content area */
+        #allImagesPage .all-images-single-row {
+            padding: 20px;
+            margin: 0;
+        }
+
+        .all-images-single-row .image-slot {
+            width: 90%;
+            height: 330;
+            min-width: 250px;
+            min-height: 250px;
+        }
+
+        /* Responsive design for smaller screens */
+        @media (max-width: 768px) {
+            .all-images-single-row {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .all-images-single-row .image-slot {
+                height: 200px;
+                min-height: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .all-images-single-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .all-images-single-row .image-slot {
+                height: 220px;
+                min-height: 220px;
+            }
+        }
+
         .image-placeholder {
             display: flex;
             flex-direction: column;
@@ -345,17 +498,62 @@
             font-weight: bold;
         }
 
-        .image-number {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: rgba(220, 148, 188, 0.9);
-            color: white;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: bold;
+                 .image-number {
+             position: absolute;
+             top: 5px;
+             right: 5px;
+             background: rgba(220, 148, 188, 0.9);
+             color: white;
+             padding: 2px 6px;
+             border-radius: 4px;
+             font-size: 0.8rem;
+             font-weight: bold;
+         }
+
+        /* Paid addition image card (Tatreez) */
+        .addition-image-card {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
         }
+
+        .addition-image-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .addition-image-card-header h5 {
+            margin: 0;
+            color: #856404;
+            font-size: 1rem;
+        }
+
+        .badge-paid {
+            background: #DC94BC;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin-left: 8px;
+            white-space: nowrap;
+        }
+         
+         /* Add company name to each section for screen viewing */
+         .section::before {
+             content: "أوجي سان";
+             display: block;
+             text-align: center;
+             font-size: 16px;
+             font-weight: bold;
+             color: #DC94BC;
+             margin-bottom: 8px;
+             border-bottom: 1px solid #DC94BC;
+             padding-bottom: 3px;
+         }
     </style>
 </head>
 <body>
@@ -392,108 +590,77 @@
         <div class="section-header">
             <h3>ملخص جميع الصور</h3>
         </div>
-        <div class="all-images-grid">
-            <!-- Front Images (1-2) -->
-            <div class="image-category">
-                <h4 class="category-title">الواجهة الأمامية</h4>
-                <div class="images-row">
-                    <div class="image-slot" id="front-image-1">
-                        <div class="image-placeholder">
-                            <i class="fas fa-image"></i>
-                            <span>الصورة 1</span>
-                        </div>
-                    </div>
-                    <div class="image-slot" id="front-image-2">
-                        <div class="image-placeholder">
-                            <i class="fas fa-image"></i>
-                            <span>الصورة 2</span>
-                        </div>
-                    </div>
+        <div class="all-images-single-row">
+            <div class="image-slot" id="image-1">
+                <div class="image-placeholder">
+                    <i class="fas fa-image"></i>
+                    <span>1</span>
                 </div>
             </div>
-
-            <!-- Right Sleeve Images (3-6) -->
-            <div class="image-category">
-                <h4 class="category-title">الأكمام اليمنى</h4>
-                <div class="images-row">
-                    <div class="image-slot" id="right-image-3">
-                        <div class="image-placeholder">
-                            <i class="fas fa-image"></i>
-                            <span>الصورة 3</span>
-                        </div>
-                    </div>
-                    <div class="image-slot" id="right-image-4">
-                        <div class="image-placeholder">
-                            <i class="fas fa-image"></i>
-                            <span>الصورة 4</span>
-                        </div>
-                    </div>
-                    <div class="image-slot" id="right-image-5">
-                        <div class="image-placeholder">
-                            <i class="fas fa-image"></i>
-                            <span>الصورة 5</span>
-                        </div>
-                    </div>
-                    <div class="image-slot" id="right-image-6">
-                        <div class="image-placeholder">
-                            <i class="fas fa-image"></i>
-                            <span>الصورة 6</span>
-                        </div>
-                    </div>
+            <div class="image-slot" id="image-2">
+                <div class="image-placeholder">
+                    <i class="fas fa-image"></i>
+                    <span>2</span>
                 </div>
             </div>
-
-            <!-- Left Sleeve Images (7-10) -->
-            <div class="image-category">
-                <h4 class="category-title">الأكمام اليسرى</h4>
-                <div class="images-row">
-                    <div class="image-slot" id="left-image-7">
-                        <div class="image-placeholder">
-                            <i class="fas fa-image"></i>
-                            <span>الصورة 7</span>
-                        </div>
-                    </div>
-                    <div class="image-slot" id="left-image-8">
-                        <div class="image-placeholder">
-                            <i class="fas fa-image"></i>
-                            <span>الصورة 8</span>
-                        </div>
-                    </div>
-                    <div class="image-slot" id="left-image-9">
-                        <div class="image-placeholder">
-                            <i class="fas fa-image"></i>
-                            <span>الصورة 9</span>
-                        </div>
-                    </div>
-                    <div class="image-slot" id="left-image-10">
-                        <div class="image-placeholder">
-                            <i class="fas fa-image"></i>
-                            <span>الصورة 10</span>
-                        </div>
-                    </div>
+            <div class="image-slot" id="image-3">
+                <div class="image-placeholder">
+                    <i class="fas fa-image"></i>
+                    <span>3</span>
                 </div>
             </div>
-
-            <!-- Back Image (11) -->
-            <div class="image-category">
-                <h4 class="category-title">الظهر</h4>
-                <div class="images-row">
-                    <div class="image-slot" id="back-image-11">
-                        <div class="image-placeholder">
-                            <i class="fas fa-image"></i>
-                            <span>الصورة 11</span>
-                        </div>
-                    </div>
+            <div class="image-slot" id="image-4">
+                <div class="image-placeholder">
+                    <i class="fas fa-image"></i>
+                    <span>4</span>
+                </div>
+            </div>
+            <div class="image-slot" id="image-5">
+                <div class="image-placeholder">
+                    <i class="fas fa-image"></i>
+                    <span>5</span>
+                </div>
+            </div>
+            <div class="image-slot" id="image-6">
+                <div class="image-placeholder">
+                    <i class="fas fa-image"></i>
+                    <span>6</span>
+                </div>
+            </div>
+            <div class="image-slot" id="image-7">
+                <div class="image-placeholder">
+                    <i class="fas fa-image"></i>
+                    <span>7</span>
+                </div>
+            </div>
+            <div class="image-slot" id="image-8">
+                <div class="image-placeholder">
+                    <i class="fas fa-image"></i>
+                    <span>8</span>
+                </div>
+            </div>
+            <div class="image-slot" id="image-9">
+                <div class="image-placeholder">
+                    <i class="fas fa-image"></i>
+                    <span>9</span>
+                </div>
+            </div>
+            <div class="image-slot" id="image-10">
+                <div class="image-placeholder">
+                    <i class="fas fa-image"></i>
+                    <span>10</span>
+                </div>
+            </div>
+            <div class="image-slot" id="image-11">
+                <div class="image-placeholder">
+                    <i class="fas fa-image"></i>
+                    <span>11</span>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Supabase configuration
-        const SUPABASE_URL = 'https://pxapeabojeqcwrcfaunx.supabase.co';
-        const SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4YXBlYWJvamVxY3dyY2ZhdW54Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0OTkwNTUyNywiZXhwIjoyMDY1NDgxNTI3fQ.y4LrbiXtJw9pDTBgU0EJZLc0nw6yRx_sVQb0fcRNBe0';
-
         // Function to handle image loading errors
         function handleImageError(img, fallbackSrc) {
             img.style.display = 'none';
@@ -504,6 +671,23 @@
         function handleImageSuccess(img, src) {
             console.log('Image loaded successfully:', src);
         }
+
+        // Attach image load/error handlers programmatically to avoid inline handlers being serialized
+        function attachImageHandlers() {
+            try {
+                const images = document.querySelectorAll('#memberModal img, #allImagesPage img');
+                images.forEach(function(img) {
+                    img.addEventListener('error', function() { handleImageError(img, img.src); }, { once: true });
+                    img.addEventListener('load', function() { handleImageSuccess(img, img.src); }, { once: true });
+                });
+            } catch (e) {
+                console.warn('Failed to attach image handlers:', e);
+            }
+        }
+
+        // Supabase configuration
+        const SUPABASE_URL = 'https://pxapeabojeqcwrcfaunx.supabase.co';
+        const SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4YXBlYWJvamVxY3dyY2ZhdW54Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0OTkwNTUyNywiZXhwIjoyMDY1NDgxNTI3fQ.y4LrbiXtJw9pDTBgU0EJZLc0nw6yRx_sVQb0fcRNBe0';
 
         // Function to create member details HTML with new structure
         function createMemberDetailsHTML(member) {
@@ -541,75 +725,94 @@
                             <h3>المعلومات الأساسية والاضافات والواجهة الأمامية</h3>
                         </div>
                         
-                        <!-- Basic Info -->
-                        <div class="member-basic-info-grid">
-                            <div class="info-item">
-                                <label>الاسم:</label>
-                                <span>${member.NameBehind || member.Name || 'غير متوفر'}</span>
-                            </div>
-                           
-                            <div class="info-item">
-                                <label>المقاس:</label>
-                                <span>${member.Size || 'غير متوفر'}</span>
-                            </div>
-                            <div class="info-item">
-                                <label>لون السترة:</label>
-                                <span>${member.JacketColor || 'غير متوفر'}</span>
-                            </div>
-                            <div class="info-item">
-                                <label>لون الأكمام:</label>
-                                <span>${member.SleeveColor || 'غير متوفر'}</span>
-                            </div>
-                            <div class="info-item">
-                                <label>لون مطاط الأكمام:</label>
-                                <span>${member.SleeveRubberColor || 'غير متوفر'}</span>
-                            </div>
-                            <div class="info-item">
-                                <label>نوع الأكمام:</label>
-                                <span>${member.SleeveType || 'غير متوفر'}</span>
-                            </div>
-                             <div class="info-item">
-                                <label>الهاتف:</label>
-                                <span>${member.Phone || 'غير متوفر'}</span>
-                            </div>
-                        </div>
-
-                        <!-- Additions Section -->
-                        <div class="additions-section">
-                            <h4>الاضافات</h4>
-                            <div class="additions-grid">
-                                <div class="addition-item">
-                                    <label>القبعة الثابتة:</label>
-                                    <span>${member.FixedCap || 'غير متوفر'}</span>
-                                </div>
-                                <div class="addition-item">
-                                    <label>تطريز البطانة:</label>
-                                    <span>${member.InnerLinningTatreez || 'غير متوفر'}</span>
-                                </div>
-                                <div class="addition-item">
-                                    <label>تعليق التطريز:</label>
-                                    <span>${member.InnerLinningTatreezComment || 'غير متوفر'}</span>
-                                </div>
-                            </div>
-                            
-                            ${member.InnerLinningTatreezImageBB ? `
-                                <div style="margin-top: 15px;">
-                                    <h5>صورة تطريز البطانة:</h5>
-                                    <div class="image-preview-container">
-                                        <img src="${member.InnerLinningTatreezImageBB}" alt="صورة تطريز البطانة" onerror="handleImageError(this, '${member.InnerLinningTatreezImageBB}')" onload="handleImageSuccess(this, '${member.InnerLinningTatreezImageBB}')" crossorigin="anonymous">
+                        <div class="basic-additions">
+                            <div>
+                                <!-- Basic Info -->
+                                <div class="member-basic-info-grid">
+                                    <div class="info-item">
+                                        <label>الاسم بالخلف:</label>
+                                        <span>${member.NameBehind || 'غير متوفر'}</span>
+                                    </div>
+                                   
+                                    <div class="info-item">
+                                        <label>المقاس:</label>
+                                        <span>${member.Size || 'غير متوفر'}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>لون السترة:</label>
+                                        <span>${member.JacketColor || 'غير متوفر'}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>لون الأكمام:</label>
+                                        <span>${member.SleeveColor || 'غير متوفر'}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>لون مطاط الأكمام:</label>
+                                        <span>${member.SleeveRubberColor || 'غير متوفر'}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>نوع الأكمام:</label>
+                                        <span>${member.SleeveType || 'غير متوفر'}</span>
+                                    </div>
+                                     <div class="info-item">
+                                        <label>الهاتف:</label>
+                                        <span>${member.Phone || 'غير متوفر'}</span>
                                     </div>
                                 </div>
-                            ` : ''}
+                            </div>
+                            <div>
+                                <!-- Additions Section -->
+                                <div class="additions-section">
+                                    <h4>الاضافات</h4>
+                                    <div class="additions-layout">
+                                        <div class="additions-left">
+                                            <div class="additions-grid">
+                                                <div class="addition-item">
+                                                    <label>القبعة الثابتة:</label>
+                                                    <span>${member.FixedCap || 'غير متوفر'}</span>
+                                                </div>
+                                                <div class="addition-item">
+                                                    <label>تطريز البطانة:</label>
+                                                    <span>${member.InnerLinningTatreez || 'غير متوفر'}</span>
+                                                </div>
+                                            </div>
+                                            <div class="addition-comment-block">
+                                                <div class="image-comment">
+                                                    <strong>تعليق التطريز:</strong>
+                                                    ${member.InnerLinningTatreezComment || 'غير متوفر'}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="additions-right">
+                                            ${member.InnerLinningTatreezImageBB ? `
+                                                <div class="addition-image-card">
+                                                    <div class="addition-image-card-header">
+                                                        <h5>صورة تطريز البطانة</h5>
+                                                    </div>
+                                                    <div class="image-preview-container">
+                                                        <img src="${member.InnerLinningTatreezImageBB}" alt="صورة تطريز البطانة" crossorigin="anonymous">
+                                                    </div>
+                                                </div>
+                                            ` : `
+                                                <div class="no-image">
+                                                    <i class="fas fa-image"></i>
+                                                    <span>لا توجد صورة</span>
+                                                </div>
+                                            `}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Front Photos (1 & 2) -->
-                        <div class="photos-grid">
+                        <div class="photos-grid front-photos">
                             ${frontImages.map(img => `
                                 <div class="photo-item">
                                     <h4>الصورة ${img.number}</h4>
                                     ${img.hasImageBB ? `
                                         <div class="image-preview-container">
-                                            <img src="${img.imageBB}" alt="صورة ${img.number}" onerror="handleImageError(this, '${img.imageBB}')" onload="handleImageSuccess(this, '${img.imageBB}')" crossorigin="anonymous">
+                                            <img src="${img.imageBB}" alt="صورة ${img.number}" crossorigin="anonymous">
                                         </div>
                                     ` : `
                                         <div class="no-image">
@@ -629,7 +832,8 @@
                     <!-- Section 2: Right Sleeves (Photos 3-6) -->
                     <div class="section">
                         <div class="section-header">
-                            <h3>الأكمام اليمنى (الصور 3-6)</h3>
+                            <div class="section-thumb"><img src="https://i.ibb.co/GvCjm7FB/Right.png" alt="Right sleeve preview" crossorigin="anonymous"></div>
+                            <h3>الكم الايمن (الصور 3-6)</h3>
                         </div>
                         <div class="photos-grid">
                             ${rightSleeveImages.map(img => `
@@ -637,7 +841,7 @@
                                     <h4>الصورة ${img.number}</h4>
                                     ${img.hasImageBB ? `
                                         <div class="image-preview-container">
-                                            <img src="${img.imageBB}" alt="صورة ${img.number}" onerror="handleImageError(this, '${img.imageBB}')" onload="handleImageSuccess(this, '${img.imageBB}')" crossorigin="anonymous">
+                                            <img src="${img.imageBB}" alt="صورة ${img.number}" crossorigin="anonymous">
                                         </div>
                                     ` : `
                                         <div class="no-image">
@@ -657,7 +861,8 @@
                     <!-- Section 3: Left Sleeves (Photos 7-10) -->
                     <div class="section">
                         <div class="section-header">
-                            <h3>الأكمام اليسرى (الصور 7-10)</h3>
+                            <div class="section-thumb"><img src="https://i.ibb.co/wNL3vS49/Left.png" alt="Left sleeve preview" crossorigin="anonymous"></div>
+                            <h3>الكم الايسر (الصور 7-10)</h3>
                         </div>
                         <div class="photos-grid">
                             ${leftSleeveImages.map(img => `
@@ -665,7 +870,7 @@
                                     <h4>الصورة ${img.number}</h4>
                                     ${img.hasImageBB ? `
                                         <div class="image-preview-container">
-                                            <img src="${img.imageBB}" alt="صورة ${img.number}" onerror="handleImageError(this, '${img.imageBB}')" onload="handleImageSuccess(this, '${img.imageBB}')" crossorigin="anonymous">
+                                            <img src="${img.imageBB}" alt="صورة ${img.number}" crossorigin="anonymous">
                                         </div>
                                     ` : `
                                         <div class="no-image">
@@ -693,7 +898,7 @@
                                     <h4>الصورة ${img.number}</h4>
                                     ${img.hasImageBB ? `
                                         <div class="image-preview-container">
-                                            <img src="${img.imageBB}" alt="صورة ${img.number}" onerror="handleImageError(this, '${img.imageBB}')" onload="handleImageSuccess(this, '${img.imageBB}')" crossorigin="anonymous">
+                                            <img src="${img.imageBB}" alt="صورة ${img.number}" crossorigin="anonymous">
                                         </div>
                                     ` : `
                                         <div class="no-image">
@@ -721,7 +926,7 @@
             // Populate images for each category
             for (let i = 1; i <= 11; i++) {
                 const imageBB = member[`Image${i}BB`];
-                const imageSlot = document.getElementById(getImageSlotId(i));
+                const imageSlot = document.getElementById(`image-${i}`);
                 
                 if (imageSlot && imageBB) {
                     // Create image element
@@ -748,19 +953,6 @@
                     imageSlot.appendChild(img);
                     imageSlot.appendChild(numberBadge);
                 }
-            }
-        }
-
-        // Helper function to get image slot ID based on image number
-        function getImageSlotId(imageNumber) {
-            if (imageNumber <= 2) {
-                return `front-image-${imageNumber}`;
-            } else if (imageNumber <= 6) {
-                return `right-image-${imageNumber}`;
-            } else if (imageNumber <= 10) {
-                return `left-image-${imageNumber}`;
-            } else {
-                return `back-image-${imageNumber}`;
             }
         }
 
@@ -834,6 +1026,7 @@
                     
                     // Populate all images page
                     populateAllImagesPage(member);
+                    attachImageHandlers();
                     
                     // Wait for images to load
                     setTimeout(() => {
@@ -870,6 +1063,7 @@
                         
                         // Populate all images page
                         populateAllImagesPage(member);
+                        attachImageHandlers();
                         
                         // Clean up the data from localStorage after loading
                         localStorage.removeItem(dataId);
@@ -909,6 +1103,7 @@
                     
                     // Populate all images page
                     populateAllImagesPage(member);
+                    attachImageHandlers();
                     
                     // Wait for images to load
                     setTimeout(() => {

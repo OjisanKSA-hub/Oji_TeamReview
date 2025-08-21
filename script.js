@@ -485,7 +485,11 @@ function createMemberDetailsHTML(member) {
                 <div class="member-basic-info-grid">
                     <div class="info-item">
                         <label>الاسم:</label>
-                        <span>${member.NameBehind || member.Name || 'غير متوفر'}</span>
+                        <span>${member.Name || 'غير متوفر'}</span>
+                    </div>
+                    <div class="info-item">
+                        <label>الاسم بالخلف:</label>
+                        <span>${member.NameBehind || 'غير متوفر'}</span>
                     </div>
                     <div class="info-item">
                         <label>الهاتف:</label>

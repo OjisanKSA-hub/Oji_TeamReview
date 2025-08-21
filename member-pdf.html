@@ -998,7 +998,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const dataId = urlParams.get('dataId');
             const memberData = urlParams.get('member');
-            const memberId = urlParams.get('memberId');
+            const memberId = urlParams.get('memberId') || urlParams.get('memberid') || urlParams.get('id');
             
             // Priority 1: Fetch from Supabase by memberId
             if (memberId) {
@@ -1124,8 +1124,8 @@
                      document.getElementById('memberDetails').innerHTML = `
                          <div class="loading">
                              <i class="fas fa-exclamation-triangle"></i>
-                             <p>لم يتم العثور على بيانات العضو. يرجى التأكد من وجود معامل memberId أو dataId أو member في الرابط.</p>
-                             <p>مثال: ?memberId=65 أو ?dataId=abc123</p>
+                             <p>لم يتم العثور على بيانات العضو. يرجى التأكد من وجود معامل memberId/memberid أو dataId أو member في الرابط.</p>
+                             <p>مثال: ?memberId=65 أو ?memberid=65 أو ?dataId=abc123</p>
                          </div>
                      `;
                  }

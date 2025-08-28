@@ -181,6 +181,81 @@
             margin-top: 10px;
         }
 
+        /* New sleeve photos layout styles */
+        .sleeve-photos-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .sleeve-left-column {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 5px;
+            height: fit-content;
+        }
+
+        .sleeve-right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            height: fit-content;
+        }
+
+        /* Make ALL sleeve photos consistent in size */
+        .sleeve-photos-layout .photo-item {
+            height: fit-content;
+        }
+
+        .sleeve-photos-layout .image-preview-container {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sleeve-photos-layout .image-preview-container img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .sleeve-preview-image {
+            background: #f8f9fa;
+            border: 2px solid #DC94BC;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sleeve-preview-image img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        /* Responsive design for sleeve layout */
+        @media (max-width: 768px) {
+            .sleeve-photos-layout {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .sleeve-right-column {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+
         .photo-item {
             background: #f8f9fa;
             border: 1px solid #dee2e6;
@@ -835,26 +910,52 @@
                             <div class="section-thumb"><img src="https://i.ibb.co/GvCjm7FB/Right.png" alt="Right sleeve preview" crossorigin="anonymous"></div>
                             <h3>الكم الايمن (الصور 3-6)</h3>
                         </div>
-                        <div class="photos-grid">
-                            ${rightSleeveImages.map(img => `
-                                <div class="photo-item">
-                                    <h4>الصورة ${img.number}</h4>
-                                    ${img.hasImageBB ? `
-                                        <div class="image-preview-container">
-                                            <img src="${img.imageBB}" alt="صورة ${img.number}" crossorigin="anonymous">
+                        <div class="sleeve-photos-layout">
+                            <div class="sleeve-left-column">
+                                ${rightSleeveImages.filter(img => img.number >= 3 && img.number <= 5).map(img => `
+                                    <div class="photo-item">
+                                        <h4>الصورة ${img.number}</h4>
+                                        ${img.hasImageBB ? `
+                                            <div class="image-preview-container">
+                                                <img src="${img.imageBB}" alt="صورة ${img.number}" crossorigin="anonymous">
+                                            </div>
+                                        ` : `
+                                            <div class="no-image">
+                                                <i class="fas fa-image"></i>
+                                                <span>لا توجد صورة</span>
+                                            </div>
+                                        `}
+                                        <div class="image-comment">
+                                            <strong>التعليق:</strong> 
+                                            ${img.hasComment ? img.comment : 'لا يوجد تعليق'}
                                         </div>
-                                    ` : `
-                                        <div class="no-image">
-                                            <i class="fas fa-image"></i>
-                                            <span>لا توجد صورة</span>
-                                        </div>
-                                    `}
-                                    <div class="image-comment">
-                                        <strong>التعليق:</strong> 
-                                        ${img.hasComment ? img.comment : 'لا يوجد تعليق'}
                                     </div>
+                                `).join('')}
+                            </div>
+                            <div class="sleeve-right-column">
+                                <div class="sleeve-preview-image">
+                                    <img src="https://i.ibb.co/GvCjm7FB/Right.png" alt="Right sleeve preview" crossorigin="anonymous">
                                 </div>
-                            `).join('')}
+                                ${rightSleeveImages.filter(img => img.number === 6).map(img => `
+                                    <div class="photo-item">
+                                        <h4>الصورة ${img.number}</h4>
+                                        ${img.hasImageBB ? `
+                                            <div class="image-preview-container">
+                                                <img src="${img.imageBB}" alt="صورة ${img.number}" crossorigin="anonymous">
+                                            </div>
+                                        ` : `
+                                            <div class="no-image">
+                                                <i class="fas fa-image"></i>
+                                                <span>لا توجد صورة</span>
+                                            </div>
+                                        `}
+                                        <div class="image-comment">
+                                            <strong>التعليق:</strong> 
+                                            ${img.hasComment ? img.comment : 'لا يوجد تعليق'}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
                         </div>
                     </div>
 
@@ -864,26 +965,52 @@
                             <div class="section-thumb"><img src="https://i.ibb.co/wNL3vS49/Left.png" alt="Left sleeve preview" crossorigin="anonymous"></div>
                             <h3>الكم الايسر (الصور 7-10)</h3>
                         </div>
-                        <div class="photos-grid">
-                            ${leftSleeveImages.map(img => `
-                                <div class="photo-item">
-                                    <h4>الصورة ${img.number}</h4>
-                                    ${img.hasImageBB ? `
-                                        <div class="image-preview-container">
-                                            <img src="${img.imageBB}" alt="صورة ${img.number}" crossorigin="anonymous">
+                        <div class="sleeve-photos-layout">
+                            <div class="sleeve-left-column">
+                                ${leftSleeveImages.filter(img => img.number >= 7 && img.number <= 9).map(img => `
+                                    <div class="photo-item">
+                                        <h4>الصورة ${img.number}</h4>
+                                        ${img.hasImageBB ? `
+                                            <div class="image-preview-container">
+                                                <img src="${img.imageBB}" alt="صورة ${img.number}" crossorigin="anonymous">
+                                            </div>
+                                        ` : `
+                                            <div class="no-image">
+                                                <i class="fas fa-image"></i>
+                                                <span>لا توجد صورة</span>
+                                            </div>
+                                        `}
+                                        <div class="image-comment">
+                                            <strong>التعليق:</strong> 
+                                            ${img.hasComment ? img.comment : 'لا يوجد تعليق'}
                                         </div>
-                                    ` : `
-                                        <div class="no-image">
-                                            <i class="fas fa-image"></i>
-                                            <span>لا توجد صورة</span>
-                                        </div>
-                                    `}
-                                    <div class="image-comment">
-                                        <strong>التعليق:</strong> 
-                                        ${img.hasComment ? img.comment : 'لا يوجد تعليق'}
                                     </div>
+                                `).join('')}
+                            </div>
+                            <div class="sleeve-right-column">
+                                <div class="sleeve-preview-image">
+                                    <img src="https://i.ibb.co/wNL3vS49/Left.png" alt="Left sleeve preview" crossorigin="anonymous">
                                 </div>
-                            `).join('')}
+                                ${leftSleeveImages.filter(img => img.number === 10).map(img => `
+                                    <div class="photo-item">
+                                        <h4>الصورة ${img.number}</h4>
+                                        ${img.hasImageBB ? `
+                                            <div class="image-preview-container">
+                                                <img src="${img.imageBB}" alt="صورة ${img.number}" crossorigin="anonymous">
+                                            </div>
+                                        ` : `
+                                            <div class="no-image">
+                                                <i class="fas fa-image"></i>
+                                                <span>لا توجد صورة</span>
+                                            </div>
+                                        `}
+                                        <div class="image-comment">
+                                            <strong>التعليق:</strong> 
+                                            ${img.hasComment ? img.comment : 'لا يوجد تعليق'}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
                         </div>
                     </div>
 

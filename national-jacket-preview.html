@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>معاينة السترة الوطنية</title>
+    <link rel="stylesheet" href="national-jacket-preview.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="header-icon">
+                    <i class="fas fa-tshirt"></i>
+                </div>
+                <div class="header-text">
+                    <h1>معاينة السترة الوطنية</h1>
+                    <p>عرض تفاصيل طلب السترة</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Order Number Input Section -->
+        <div class="order-input-section">
+            <div class="input-container">
+                <div class="input-header">
+                    <i class="fas fa-search"></i>
+                    <h2>البحث عن طلب</h2>
+                </div>
+                <div class="input-content">
+                    <div class="input-group">
+                        <label for="orderNumberInput">رقم الطلب:</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="orderNumberInput" placeholder="أدخل رقم الطلب..." value="14" />
+                            <button id="loadOrderBtn" class="btn btn-primary">
+                                <i class="fas fa-search"></i> تحميل الطلب
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state">
+            <div class="loading-spinner">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>جاري تحميل البيانات...</p>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="error-state" style="display: none;">
+            <div class="error-content">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>حدث خطأ في تحميل البيانات</h3>
+                <p id="errorMessage">يرجى المحاولة مرة أخرى</p>
+                <button id="retryBtn" class="btn btn-primary">
+                    <i class="fas fa-redo"></i> إعادة المحاولة
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div id="mainContent" class="main-content" style="display: none;">
+            <!-- Order Status -->
+            <div class="status-card">
+                <div class="status-header">
+                    <i class="fas fa-info-circle"></i>
+                    <h2>حالة الطلب</h2>
+                </div>
+                <div class="status-content">
+                    <div class="status-badge" id="orderStatus">
+                        <span id="statusText">قيد المراجعة</span>
+                    </div>
+                    <div class="order-id">
+                        <span class="label">رقم الطلب:</span>
+                        <span id="orderId">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Information -->
+            <div class="info-card">
+                <div class="card-header">
+                    <i class="fas fa-user"></i>
+                    <h2>معلومات العميل</h2>
+                </div>
+                <div class="card-content">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-user-tag"></i>
+                                <span>اسم العميل</span>
+                            </div>
+                            <div class="info-value" id="customerName">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-phone"></i>
+                                <span>رقم الهاتف</span>
+                            </div>
+                            <div class="info-value" id="phoneNumber">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-globe"></i>
+                                <span>رمز الدولة</span>
+                            </div>
+                            <div class="info-value" id="phoneCode">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jacket Design Details -->
+            <div class="design-card">
+                <div class="card-header">
+                    <i class="fas fa-palette"></i>
+                    <h2>تفاصيل تصميم السترة</h2>
+                </div>
+                <div class="card-content">
+                    <div class="design-sections">
+                        <!-- Front Design -->
+                        <div class="design-section">
+                            <div class="section-header">
+                                <i class="fas fa-eye"></i>
+                                <h3>الواجهة الأمامية</h3>
+                            </div>
+                            <div class="design-content">
+                                <div class="design-item">
+                                    <span class="design-label">الحروف الأمامية:</span>
+                                    <span class="design-value" id="frontLetters">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Back Design -->
+                        <div class="design-section">
+                            <div class="section-header">
+                                <i class="fas fa-arrow-left"></i>
+                                <h3>الظهر</h3>
+                            </div>
+                            <div class="design-content">
+                                <div class="design-item">
+                                    <span class="design-label">الاسم بالخلف:</span>
+                                    <span class="design-value" id="backName">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Sleeve -->
+                        <div class="design-section">
+                            <div class="section-header">
+                                <i class="fas fa-hand-point-right"></i>
+                                <h3>الكم الأيمن</h3>
+                            </div>
+                            <div class="design-content">
+                                <div class="design-item">
+                                    <span class="design-label">تصميم الكم الأيمن:</span>
+                                    <span class="design-value" id="rightSleeveDesign">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Left Sleeve -->
+                        <div class="design-section">
+                            <div class="section-header">
+                                <i class="fas fa-hand-point-left"></i>
+                                <h3>الكم الأيسر</h3>
+                            </div>
+                            <div class="design-content">
+                                <div class="design-item">
+                                    <span class="design-label">تصميم الكم الأيسر:</span>
+                                    <span class="design-value" id="leftSleeveDesign">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Jacket Color -->
+                        <div class="design-section">
+                            <div class="section-header">
+                                <i class="fas fa-paint-brush"></i>
+                                <h3>لون السترة</h3>
+                            </div>
+                            <div class="design-content">
+                                <div class="design-item">
+                                    <span class="design-label">لون السترة:</span>
+                                    <span class="design-value" id="jacketColor">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="actions-card">
+                <div class="card-header">
+                    <i class="fas fa-cogs"></i>
+                    <h2>الإجراءات</h2>
+                </div>
+                <div class="card-content">
+                    <div class="actions-grid">
+                        <button id="refreshBtn" class="btn btn-secondary">
+                            <i class="fas fa-sync-alt"></i>
+                            تحديث البيانات
+                        </button>
+                        <button id="printBtn" class="btn btn-primary">
+                            <i class="fas fa-print"></i>
+                            طباعة التقرير
+                        </button>
+                        <button id="shareBtn" class="btn btn-success">
+                            <i class="fas fa-share"></i>
+                            مشاركة الرابط
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script src="national-jacket-preview.js"></script>
+</body>
+
+</html>

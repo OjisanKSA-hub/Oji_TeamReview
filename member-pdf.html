@@ -8,12 +8,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
+        /* Universal dark blue color rule */
+        * {
+            color: darkblue !important;
+        }
+        
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 20px;
             background-color: #f5f5f5;
             direction: rtl;
+            color: darkblue !important;
         }
 
         .modal-content {
@@ -26,7 +32,7 @@
 
         .modal-header {
             background: linear-gradient(135deg, #DC94BC, #c47ba3);
-            color: white;
+            color: darkblue !important;
             padding: 15px 20px;
             border-radius: 8px 8px 0 0;
             display: flex;
@@ -37,6 +43,7 @@
         .modal-header h2 {
             margin: 0;
             font-size: 1.5rem;
+            color: darkblue !important;
         }
 
         .brand-title {
@@ -44,6 +51,7 @@
             font-weight: bold;
             text-align: center;
             margin-bottom: 5px;
+            color: darkblue !important;
         }
 
         .close {
@@ -51,7 +59,7 @@
             cursor: pointer;
             background: none;
             border: none;
-            color: white;
+            color: darkblue !important;
         }
 
         .modal-body {
@@ -65,7 +73,7 @@
 
         .section-header {
             background: linear-gradient(135deg, #DC94BC, #c47ba3);
-            color: white;
+            color: darkblue !important;
             padding: 8px 14px;
             border-radius: 8px;
             margin-bottom: 10px;
@@ -78,6 +86,7 @@
             margin: 0;
             font-size: 1.2rem;
             line-height: 1.25;
+            color: darkblue !important;
         }
 
         /* Small circular preview in section headers */
@@ -113,13 +122,13 @@
 
         .info-item label {
             font-weight: bold;
-            color: #555;
+            color: darkblue !important;
             display: inline-block;
             margin-left: 10px;
         }
 
         .info-item span {
-            color: #333;
+            color: darkblue !important;
         }
 
         .additions-section {
@@ -131,7 +140,7 @@
         }
 
         .additions-section h4 {
-            color: #c47ba3;
+            color: darkblue !important;
             margin: 0 0 10px 0;
             border-bottom: 1px solid #DC94BC;
             padding-bottom: 5px;
@@ -264,7 +273,7 @@
         }
 
         .photo-item h4 {
-            color: #c47ba3;
+            color: darkblue !important;
             margin: 0 0 10px 0;
             text-align: center;
         }
@@ -298,7 +307,7 @@
 
         .no-image {
             text-align: center;
-            color: #6c757d;
+            color: darkblue !important;
             padding: 20px;
             background: #f8f9fa;
             border: 2px dashed #dee2e6;
@@ -309,6 +318,7 @@
             font-size: 2rem;
             margin-bottom: 10px;
             display: block;
+            color: darkblue !important;
         }
 
         .btn {
@@ -351,7 +361,7 @@
         }
 
         .download-controls h3 {
-            color: #333;
+            color: darkblue !important;
             margin-bottom: 15px;
         }
 
@@ -399,7 +409,7 @@
                  text-align: center;
                  font-size: 18px;
                  font-weight: bold;
-                 color: #DC94BC;
+                 color: darkblue !important;
                  margin-bottom: 10px;
                  border-bottom: 2px solid #DC94BC;
                  padding-bottom: 5px;
@@ -414,7 +424,7 @@
                  text-align: center;
                  font-size: 16px;
                  font-weight: bold;
-                 color: white;
+                 color: darkblue !important;
                  margin-bottom: 5px;
                  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
                  padding-bottom: 3px;
@@ -424,13 +434,14 @@
         .loading {
             text-align: center;
             padding: 50px;
-            color: #666;
+            color: darkblue !important;
         }
 
         .loading i {
             font-size: 3rem;
             margin-bottom: 20px;
             display: block;
+            color: darkblue !important;
         }
 
         /* All Images Summary Page Styles */
@@ -448,7 +459,7 @@
         }
 
         .category-title {
-            color: #c47ba3;
+            color: darkblue !important;
             margin: 0 0 15px 0;
             font-size: 1.2rem;
             font-weight: bold;
@@ -516,6 +527,7 @@
             margin: 0;
             font-size: 1.5rem;
             text-align: center;
+            color: darkblue !important;
         }
 
         /* Add padding to the content area */
@@ -559,18 +571,20 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: #DC94BC;
+            color: darkblue !important;
             text-align: center;
         }
 
         .image-placeholder i {
             font-size: 2rem;
             margin-bottom: 8px;
+            color: darkblue !important;
         }
 
         .image-placeholder span {
             font-size: 0.9rem;
             font-weight: bold;
+            color: darkblue !important;
         }
 
                  .image-number {
@@ -603,13 +617,13 @@
 
         .addition-image-card-header h5 {
             margin: 0;
-            color: #856404;
+            color: darkblue !important;
             font-size: 1rem;
         }
 
         .badge-paid {
             background: #DC94BC;
-            color: #fff;
+            color: darkblue !important;
             padding: 2px 8px;
             border-radius: 12px;
             font-size: 0.75rem;
@@ -624,7 +638,7 @@
              text-align: center;
              font-size: 16px;
              font-weight: bold;
-             color: #DC94BC;
+             color: darkblue !important;
              margin-bottom: 8px;
              border-bottom: 1px solid #DC94BC;
              padding-bottom: 3px;

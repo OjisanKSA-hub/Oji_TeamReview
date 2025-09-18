@@ -3,7 +3,6 @@
 
 // Configuration
 const WEBHOOK_BASE_URL = 'https://n8n.srv886746.hstgr.cloud/webhook/4763d0b4-cec6-4fa8-9e8b-9b8b5cdf7b74';
-const DEFAULT_RECORD_ID = '14';
 
 // DOM Elements
 const loadingState = document.getElementById('loadingState');
@@ -28,6 +27,7 @@ const backName = document.getElementById('backName');
 const rightSleeveDesign = document.getElementById('rightSleeveDesign');
 const leftSleeveDesign = document.getElementById('leftSleeveDesign');
 const jacketColor = document.getElementById('jacketColor');
+const jacketSize = document.getElementById('jacketSize');
 
 // Action buttons
 const refreshBtn = document.getElementById('refreshBtn');
@@ -36,18 +36,26 @@ const shareBtn = document.getElementById('shareBtn');
 
 // Global variables
 let currentData = null;
-let currentRecordId = DEFAULT_RECORD_ID;
+let currentRecordId = null;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    initializeApp();
     setupEventListeners();
-    checkUrlParams();
+    checkUrlParams(); // Check URL params first
+    initializeApp(); // Then initialize based on whether we have a record ID
 });
 
 // Initialize the application
 function initializeApp() {
     console.log('Initializing National Jacket Preview...');
+    
+    // Check if we have a record ID from URL or if user needs to input one
+    if (!currentRecordId) {
+        showMainContent(); // Show the input form instead of loading
+        showNotification('يرجى إدخال رقم الطلب للبحث', 'info');
+        return;
+    }
+    
     showLoading(true);
     loadData();
 }
@@ -134,6 +142,10 @@ function loadOrder(orderNumber) {
 // Load data from webhook
 async function loadData() {
     try {
+        if (!currentRecordId) {
+            throw new Error('لا يوجد رقم طلب محدد');
+        }
+        
         console.log('Loading data for record ID:', currentRecordId);
         
         const url = `${WEBHOOK_BASE_URL}?record_id=${currentRecordId}`;
@@ -214,6 +226,10 @@ function displayData(data) {
 
         if (data.jacket_color) {
             jacketColor.textContent = data.jacket_color;
+        }
+
+        if (data.jacket_size) {
+            jacketSize.textContent = data.jacket_size;
         }
 
         console.log('Data displayed successfully');
@@ -425,6 +441,10 @@ function printReport() {
                     <div class="info-item">
                         <span class="label">لون السترة:</span>
                         <span class="value">${printData.jacket_color || 'غير متوفر'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">مقاس السترة:</span>
+                        <span class="value">${printData.jacket_size || 'غير متوفر'}</span>
                     </div>
                 </div>
             </body>

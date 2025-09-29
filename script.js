@@ -892,6 +892,12 @@ async function sendReviewWebhook(payload) {
 
 // Submit review
 async function submitReview() {
+    // Disable the submit button to prevent double requests
+    const originalText = submitReviewBtn.innerHTML;
+    submitReviewBtn.disabled = true;
+    submitReviewBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+    submitReviewBtn.classList.add('loading');
+    
     showLoading(true);
     
     try {
@@ -951,7 +957,10 @@ async function submitReview() {
         // --- End webhook logic ---
         showNotification('تم إرسال المراجعة بنجاح', 'success');
         
-        // Reset and reload
+        // Update button text to show success state
+        submitReviewBtn.innerHTML = '<i class="fas fa-check"></i> تم الإرسال بنجاح';
+        
+        // Reset and reload after delay
         setTimeout(() => {
             location.reload();
         }, 2000);
@@ -959,6 +968,11 @@ async function submitReview() {
     } catch (error) {
         console.error('Error submitting review:', error);
         showNotification('خطأ في إرسال المراجعة: ' + error.message, 'error');
+        
+        // Re-enable the button on error
+        submitReviewBtn.disabled = false;
+        submitReviewBtn.innerHTML = originalText;
+        submitReviewBtn.classList.remove('loading');
     } finally {
         showLoading(false);
     }

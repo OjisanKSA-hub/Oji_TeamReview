@@ -31,6 +31,7 @@ const loadTeamBtn = document.getElementById('loadTeamBtn');
 const teamInfo = document.getElementById('teamInfo');
 const teamMembersList = document.getElementById('teamMembersList');
 const submitReviewBtn = document.getElementById('submitReviewBtn');
+const resubmitBtn = document.getElementById('resubmitBtn');
 
 // Modal elements
 const memberModal = document.getElementById('memberModal');
@@ -118,6 +119,9 @@ function setupEventListeners() {
 
     // Submit review button
     submitReviewBtn.addEventListener('click', submitReview);
+    
+    // Resubmit button
+    resubmitBtn.addEventListener('click', resubmitOrder);
 }
 
 // Check URL parameters for team code
@@ -287,6 +291,14 @@ function displayTeamInfo() {
     // Also update the old teamStatus span for compatibility
     document.getElementById('teamStatus').textContent = statusText;
     document.getElementById('teamStatus').className = `team-status ${statusClass}`;
+    
+    // Show/hide resubmit button based on status
+    const resubmitSection = document.getElementById('resubmitSection');
+    if ((currentTeam.Status || '').toLowerCase() === 'rejected') {
+        resubmitSection.style.display = 'block';
+    } else {
+        resubmitSection.style.display = 'none';
+    }
     
     // Handle Folder URL with button
     const folderURL = currentTeam['Folder URL'] || '';
@@ -887,6 +899,86 @@ async function sendReviewWebhook(payload) {
         });
     } catch (err) {
         console.error('Failed to send webhook:', err);
+    }
+}
+
+// Resubmit order (change status from rejected to pending)
+async function resubmitOrder() {
+    if (!currentTeam || !currentTeam.TeamCode) {
+        showNotification('خطأ: لم يتم العثور على رمز المجموعة', 'error');
+        return;
+    }
+    
+    // Confirm action
+    if (!confirm('هل أنت متأكد من إعادة تقديم هذا الطلب؟ سيتم تغيير الحالة إلى "قيد المراجعة".')) {
+        return;
+    }
+    
+    // Disable the button to prevent double requests
+    const originalText = resubmitBtn.innerHTML;
+    resubmitBtn.disabled = true;
+    resubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+    
+    showLoading(true);
+    
+    try {
+        // Step 1: Call the webhook with teamcode
+        console.log('Calling resubmit webhook with teamcode:', currentTeam.TeamCode);
+        const webhookUrl = 'https://n8n.srv886746.hstgr.cloud/webhook/01616c13-c703-4eff-9bd0-7368f11e56bd';
+        
+        const webhookResponse = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                teamcode: currentTeam.TeamCode
+            })
+        });
+        
+        if (!webhookResponse.ok) {
+            throw new Error(`فشل الاتصال بالخادم: ${webhookResponse.status}`);
+        }
+        
+        console.log('Webhook called successfully');
+        
+        // Step 2: Update the team status to pending in the database
+        console.log('Updating team status to pending...');
+        
+        try {
+            await updateTeamStatusWithServiceRole(currentTeam.id, 'pending');
+        } catch (restError) {
+            console.warn('Direct REST API failed, trying Supabase client:', restError);
+            
+            // Fallback to Supabase client
+            const supabaseWithAuth = await getSupabaseWithAuth();
+            const { error: teamError } = await supabaseWithAuth
+                .from('team_leader_form')
+                .update({ Status: 'pending' })
+                .eq('id', currentTeam.id);
+            
+            if (teamError) throw teamError;
+        }
+        
+        showNotification('تم إعادة تقديم الطلب بنجاح! سيتم تحديث الصفحة...', 'success');
+        
+        // Update button to show success
+        resubmitBtn.innerHTML = '<i class="fas fa-check"></i> تم بنجاح';
+        
+        // Reload the page after a short delay
+        setTimeout(() => {
+            location.reload();
+        }, 2000);
+        
+    } catch (error) {
+        console.error('Error resubmitting order:', error);
+        showNotification('خطأ في إعادة تقديم الطلب: ' + error.message, 'error');
+        
+        // Re-enable the button on error
+        resubmitBtn.disabled = false;
+        resubmitBtn.innerHTML = originalText;
+    } finally {
+        showLoading(false);
     }
 }
 

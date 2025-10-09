@@ -335,6 +335,16 @@ header h1 i {
     box-shadow: 0 8px 25px rgba(255, 65, 108, 0.4);
 }
 
+.btn-warning {
+    background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
+    color: white;
+}
+
+.btn-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(243, 156, 18, 0.4);
+}
+
 .btn-secondary {
     background: #6c757d;
     color: white;

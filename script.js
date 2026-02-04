@@ -5,8 +5,9 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // Service role key for database access (bypasses RLS completely)
 const SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4YXBlYWJvamVxY3dyY2ZhdW54Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0OTkwNTUyNywiZXhwIjoyMDY1NDgxNTI3fQ.y4LrbiXtJw9pDTBgU0EJZLc0nw6yRx_sVQb0fcRNBe0';
 
-// Initialize Supabase client
-let supabase = null;
+// Initialize Supabase client (use a different name than the global `supabase`
+// exposed by the CDN script to avoid "Identifier 'supabase' has already been declared" errors)
+let supabaseClient = null;
 
 // Global variables
 let currentTeam = null;
@@ -64,7 +65,7 @@ async function initializeSupabase() {
         
         // Check if Supabase is available globally
         if (typeof window.supabase !== 'undefined') {
-            supabase = window.supabase.createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
             
             console.log('Supabase initialized successfully with service role key');
             return true;
@@ -72,7 +73,7 @@ async function initializeSupabase() {
         
         // Fallback: try to import dynamically
         const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
-        supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+        supabaseClient = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
         
         console.log('Supabase initialized successfully with service role key');
         return true;
@@ -1087,13 +1088,13 @@ function showNotification(message, type = 'info') {
 
 // Helper function to ensure service role key is used for all database calls
 async function getSupabaseWithAuth() {
-    if (!supabase) {
+    if (!supabaseClient) {
         throw new Error('Supabase client not initialized');
     }
     
     // The service role key should already be set in the client initialization
     // No need to set auth session or headers manually
-    return supabase;
+    return supabaseClient;
 }
 
 // Alternative approach: Create a custom fetch function that always includes JWT

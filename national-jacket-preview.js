@@ -2,7 +2,8 @@
 // Handles data fetching from webhook and display management
 
 // Configuration
-const WEBHOOK_BASE_URL = 'https://n8n.srv886746.hstgr.cloud/webhook/4763d0b4-cec6-4fa8-9e8b-9b8b5cdf7b74';
+// Updated to new webhook-test endpoint
+const WEBHOOK_BASE_URL = 'https://n8n.srv886746.hstgr.cloud/webhook/53490034-7aa7-4a9c-ad29-f78b71b16bfe';
 
 // DOM Elements
 const loadingState = document.getElementById('loadingState');

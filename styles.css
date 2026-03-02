@@ -66,6 +66,17 @@ header h1 i {
     margin-bottom: 15px;
 }
 
+.search-note {
+    font-size: 0.9rem;
+    color: #856404;
+    background: #fff3cd;
+    border: 1px solid #ffe082;
+    border-radius: 6px;
+    padding: 8px 14px;
+    display: inline-block;
+    margin-bottom: 15px;
+}
+
 .input-group {
     display: flex;
     gap: 15px;

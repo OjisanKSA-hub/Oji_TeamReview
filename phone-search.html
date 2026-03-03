@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>البحث برقم الهاتف</title>
+    <title>البحث المتقدم</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
@@ -12,7 +12,7 @@
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-phone-alt"></i> البحث برقم الهاتف</h1>
+            <h1><i class="fas fa-search"></i> البحث المتقدم</h1>
             <a href="index.html" class="btn btn-secondary">
                 <i class="fas fa-arrow-right"></i> العودة
             </a>
@@ -21,12 +21,25 @@
         <!-- Phone Search Section -->
         <div class="team-code-section">
             <div class="code-input-container">
-                <label for="phoneInput">رقم الهاتف:</label>
+                <label for="phoneInput">البحث برقم الهاتف:</label>
                 <p class="search-note">يرجى كتابة الرقم بدون رمز الدولة +966 وبدون صفر في البداية</p>
                 <div class="input-group">
                     <input type="text" id="phoneInput" placeholder="مثال: 536142021" />
                     <button id="searchBtn" class="btn btn-primary">
-                        <i class="fas fa-search"></i> بحث
+                        <i class="fas fa-search"></i> بحث بالهاتف
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TeamCode Search Section -->
+        <div class="team-code-section">
+            <div class="code-input-container">
+                <label for="teamCodeSearchInput">البحث برمز المجموعة:</label>
+                <div class="input-group">
+                    <input type="text" id="teamCodeSearchInput" placeholder="أدخل رمز المجموعة..." />
+                    <button id="searchByCodeBtn" class="btn btn-primary">
+                        <i class="fas fa-search"></i> بحث بالرمز
                     </button>
                 </div>
             </div>

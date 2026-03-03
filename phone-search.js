@@ -11,6 +11,8 @@ let searchSource = null; // 'team' or 'national'
 // DOM elements
 const phoneInput = document.getElementById('phoneInput');
 const searchBtn = document.getElementById('searchBtn');
+const teamCodeSearchInput = document.getElementById('teamCodeSearchInput');
+const searchByCodeBtn = document.getElementById('searchByCodeBtn');
 const shareableLinkSection = document.getElementById('shareableLinkSection');
 const shareableLink = document.getElementById('shareableLink');
 const copyLinkBtn = document.getElementById('copyLinkBtn');
@@ -35,6 +37,11 @@ function setupEventListeners() {
         if (e.key === 'Enter') searchByPhone();
     });
 
+    searchByCodeBtn.addEventListener('click', searchByTeamCode);
+    teamCodeSearchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') searchByTeamCode();
+    });
+
     copyLinkBtn.addEventListener('click', copyShareableLink);
 
     memberModalClose.addEventListener('click', closeMemberModal);
@@ -47,9 +54,13 @@ function setupEventListeners() {
 function checkUrlParams() {
     const urlParams = new URLSearchParams(window.location.search);
     const phone = urlParams.get('phone');
+    const code = urlParams.get('code');
     if (phone) {
         phoneInput.value = phone;
         searchByPhone();
+    } else if (code) {
+        teamCodeSearchInput.value = code;
+        searchByTeamCode();
     }
 }
 
@@ -63,14 +74,7 @@ async function searchByPhone() {
     }
 
     showLoading(true);
-
-    // Reset previous results
-    currentTeam = null;
-    currentMembers = [];
-    currentNationalOrder = null;
-    searchSource = null;
-    document.getElementById('teamInfo').style.display = 'none';
-    document.getElementById('nationalOrderInfo').style.display = 'none';
+    resetResults();
 
     try {
         // 1) Search team_leader_form first
@@ -126,6 +130,57 @@ async function searchByPhone() {
     }
 }
 
+async function searchByTeamCode() {
+    const code = teamCodeSearchInput.value.trim();
+    if (!code) {
+        showNotification('يرجى إدخال رمز المجموعة', 'error');
+        return;
+    }
+
+    showLoading(true);
+    resetResults();
+
+    try {
+        // Search team_leader_form where TeamCode OR old_TeamCode equals the value
+        const teamData = await fetchTeamByCode(code);
+
+        if (!teamData || teamData.length === 0) {
+            throw new Error('لم يتم العثور على مجموعة بهذا الرمز');
+        }
+
+        searchSource = 'team';
+        const team = teamData[0];
+        currentTeam = team;
+
+        // Fetch members checking both TeamCode and old_TeamCode
+        const members = await fetchMembersByTeamCodeOrOld(code);
+        currentMembers = members || [];
+
+        displayTeamInfo();
+        displayTeamMembers();
+        updateShareableLinkForCode(code);
+
+        resultsSection.style.display = 'block';
+        showNotification(`تم العثور على النتائج (${currentMembers.length} عضو)`, 'success');
+
+    } catch (error) {
+        console.error('Search error:', error);
+        showNotification('خطأ في البحث: ' + error.message, 'error');
+        resultsSection.style.display = 'none';
+    } finally {
+        showLoading(false);
+    }
+}
+
+function resetResults() {
+    currentTeam = null;
+    currentMembers = [];
+    currentNationalOrder = null;
+    searchSource = null;
+    document.getElementById('teamInfo').style.display = 'none';
+    document.getElementById('nationalOrderInfo').style.display = 'none';
+}
+
 // ── Supabase REST helpers ───────────────────────────────────────────
 
 async function fetchTeamByPhone(phone) {
@@ -169,8 +224,49 @@ async function fetchNationalOrderByPhone(phone) {
 }
 
 async function fetchMembersByTeamCode(teamCode) {
-    // No status filter — fetch all members for this team code
     const url = `${SUPABASE_URL}/rest/v1/team_member_submission?TeamCode=eq.${teamCode}&select=*`;
+
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
+            'apikey': SERVICE_ROLE_KEY,
+            'Content-Type': 'application/json'
+        }
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+
+    return response.json();
+}
+
+async function fetchTeamByCode(code) {
+    // Match where TeamCode OR old_TeamCode equals the value
+    const url = `${SUPABASE_URL}/rest/v1/team_leader_form?or=(TeamCode.eq.${code},old_TeamCode.eq.${code})&select=*`;
+
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
+            'apikey': SERVICE_ROLE_KEY,
+            'Content-Type': 'application/json'
+        }
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+
+    return response.json();
+}
+
+async function fetchMembersByTeamCodeOrOld(code) {
+    // Match members where TeamCode OR old_TeamCode equals the value
+    const url = `${SUPABASE_URL}/rest/v1/team_member_submission?or=(TeamCode.eq.${code},old_TeamCode.eq.${code})&select=*`;
 
     const response = await fetch(url, {
         method: 'GET',
@@ -489,6 +585,13 @@ function createMemberDetailsHTML(member) {
 function updateShareableLink(phone) {
     const url = new URL(window.location.href.split('?')[0]);
     url.searchParams.set('phone', phone);
+    shareableLink.value = url.toString();
+    shareableLinkSection.style.display = 'block';
+}
+
+function updateShareableLinkForCode(code) {
+    const url = new URL(window.location.href.split('?')[0]);
+    url.searchParams.set('code', code);
     shareableLink.value = url.toString();
     shareableLinkSection.style.display = 'block';
 }

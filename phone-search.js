@@ -141,27 +141,44 @@ async function searchByTeamCode() {
     resetResults();
 
     try {
-        // Search team_leader_form where TeamCode OR old_TeamCode equals the value
+        // 1) Search team_leader_form where TeamCode OR old_TeamCode equals the value
         const teamData = await fetchTeamByCode(code);
+        const members = await fetchMembersByTeamCodeOrOld(code);
 
-        if (!teamData || teamData.length === 0) {
-            throw new Error('لم يتم العثور على مجموعة بهذا الرمز');
+        if ((teamData && teamData.length > 0) || (members && members.length > 0)) {
+            searchSource = 'team';
+            if (teamData && teamData.length > 0) {
+                currentTeam = teamData[0];
+            }
+            currentMembers = members || [];
+
+            if (currentTeam) {
+                displayTeamInfo();
+            }
+            displayTeamMembers();
+            updateShareableLinkForCode(code);
+
+            resultsSection.style.display = 'block';
+            showNotification(`تم العثور على النتائج (${currentMembers.length} عضو)`, 'success');
+            return;
         }
 
-        searchSource = 'team';
-        const team = teamData[0];
-        currentTeam = team;
+        // 2) Fallback: search national_jacket_orders by id
+        const nationalData = await fetchNationalOrderById(code);
 
-        // Fetch members checking both TeamCode and old_TeamCode
-        const members = await fetchMembersByTeamCodeOrOld(code);
-        currentMembers = members || [];
+        if (nationalData && nationalData.length > 0) {
+            searchSource = 'national';
+            currentNationalOrder = nationalData[0];
 
-        displayTeamInfo();
-        displayTeamMembers();
-        updateShareableLinkForCode(code);
+            displayNationalOrderInfo();
+            updateShareableLinkForCode(code);
 
-        resultsSection.style.display = 'block';
-        showNotification(`تم العثور على النتائج (${currentMembers.length} عضو)`, 'success');
+            resultsSection.style.display = 'block';
+            showNotification('تم العثور على طلب جاكيت وطني', 'success');
+            return;
+        }
+
+        throw new Error('لم يتم العثور على بيانات بهذا الرمز');
 
     } catch (error) {
         console.error('Search error:', error);
@@ -225,6 +242,26 @@ async function fetchNationalOrderByPhone(phone) {
 
 async function fetchMembersByTeamCode(teamCode) {
     const url = `${SUPABASE_URL}/rest/v1/team_member_submission?TeamCode=eq.${teamCode}&select=*`;
+
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
+            'apikey': SERVICE_ROLE_KEY,
+            'Content-Type': 'application/json'
+        }
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+
+    return response.json();
+}
+
+async function fetchNationalOrderById(id) {
+    const url = `${SUPABASE_URL}/rest/v1/national_jacket_orders?id=eq.${id}&select=*`;
 
     const response = await fetch(url, {
         method: 'GET',

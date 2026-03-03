@@ -5,6 +5,8 @@ const SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhY
 let currentTeam = null;
 let currentMembers = [];
 let currentMember = null;
+let currentNationalOrder = null;
+let searchSource = null; // 'team' or 'national'
 
 // DOM elements
 const phoneInput = document.getElementById('phoneInput');
@@ -62,35 +64,58 @@ async function searchByPhone() {
 
     showLoading(true);
 
+    // Reset previous results
+    currentTeam = null;
+    currentMembers = [];
+    currentNationalOrder = null;
+    searchSource = null;
+    document.getElementById('teamInfo').style.display = 'none';
+    document.getElementById('nationalOrderInfo').style.display = 'none';
+
     try {
-        // Search team_leader_form where Phone contains the number
+        // 1) Search team_leader_form first
         const teamData = await fetchTeamByPhone(phone);
-        if (!teamData || teamData.length === 0) {
-            throw new Error('لم يتم العثور على بيانات بهذا الرقم');
+
+        if (teamData && teamData.length > 0) {
+            searchSource = 'team';
+            const team = teamData[0];
+            currentTeam = team;
+
+            const memberTeamCode = (team.TeamCode === 0 || team.TeamCode === '0')
+                ? team.old_TeamCode
+                : team.TeamCode;
+
+            let members = [];
+            if (memberTeamCode) {
+                members = await fetchMembersByTeamCode(memberTeamCode);
+            }
+            currentMembers = members || [];
+
+            displayTeamInfo();
+            displayTeamMembers();
+            updateShareableLink(phone);
+
+            resultsSection.style.display = 'block';
+            showNotification(`تم العثور على النتائج (${currentMembers.length} عضو)`, 'success');
+            return;
         }
 
-        // Take first match
-        const team = teamData[0];
-        currentTeam = team;
+        // 2) Fallback: search national_jacket_orders
+        const nationalData = await fetchNationalOrderByPhone(phone);
 
-        // Determine which code to use for member lookup
-        const memberTeamCode = (team.TeamCode === 0 || team.TeamCode === '0')
-            ? team.old_TeamCode
-            : team.TeamCode;
+        if (nationalData && nationalData.length > 0) {
+            searchSource = 'national';
+            currentNationalOrder = nationalData[0];
 
-        // Fetch all members regardless of status
-        let members = [];
-        if (memberTeamCode) {
-            members = await fetchMembersByTeamCode(memberTeamCode);
+            displayNationalOrderInfo();
+            updateShareableLink(phone);
+
+            resultsSection.style.display = 'block';
+            showNotification('تم العثور على طلب جاكيت وطني', 'success');
+            return;
         }
-        currentMembers = members || [];
 
-        displayTeamInfo();
-        displayTeamMembers();
-        updateShareableLink(phone);
-
-        resultsSection.style.display = 'block';
-        showNotification(`تم العثور على النتائج (${currentMembers.length} عضو)`, 'success');
+        throw new Error('لم يتم العثور على بيانات بهذا الرقم');
 
     } catch (error) {
         console.error('Search error:', error);
@@ -105,6 +130,26 @@ async function searchByPhone() {
 
 async function fetchTeamByPhone(phone) {
     const url = `${SUPABASE_URL}/rest/v1/team_leader_form?Phone=like.*${phone}*&select=*`;
+
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
+            'apikey': SERVICE_ROLE_KEY,
+            'Content-Type': 'application/json'
+        }
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+
+    return response.json();
+}
+
+async function fetchNationalOrderByPhone(phone) {
+    const url = `${SUPABASE_URL}/rest/v1/national_jacket_orders?phone=like.*${phone}*&select=*`;
 
     const response = await fetch(url, {
         method: 'GET',
@@ -203,6 +248,47 @@ function displayTeamInfo() {
     document.getElementById('teamTotalPrice').textContent = calculateTotalPrice();
 
     teamInfo.style.display = 'block';
+}
+
+function displayNationalOrderInfo() {
+    const order = currentNationalOrder;
+    const container = document.getElementById('nationalOrderInfo');
+
+    const statusMap = {
+        'pending': 'قيد المراجعة',
+        'accepted': 'مقبول',
+        'rejected': 'مرفوض',
+        'processing': 'قيد المعالجة',
+        'completed': 'مكتمل'
+    };
+    const status = (order.process_status || 'pending').toLowerCase();
+    const statusText = statusMap[status] || order.process_status || 'غير معروف';
+    const statusClass = status;
+
+    document.getElementById('natOrderId').textContent = order.id ?? 'غير متوفر';
+    document.getElementById('natCustomerName').textContent = order.customer_name ?? 'غير متوفر';
+    document.getElementById('natPhone').textContent = (order.phone_code || '') + ' ' + (order.phone || 'غير متوفر');
+    document.getElementById('natFrontLetters').textContent = order.front_letters ?? 'غير متوفر';
+    document.getElementById('natBackName').textContent = order.back_name ?? 'غير متوفر';
+    document.getElementById('natRightSleeve').textContent = order.right_sleeve_design ?? 'غير متوفر';
+    document.getElementById('natLeftSleeve').textContent = order.left_sleeve_design ?? 'غير متوفر';
+    document.getElementById('natJacketColor').textContent = order.jacket_color ?? 'غير متوفر';
+    document.getElementById('natJacketSize').textContent = order.jacket_size ?? 'غير متوفر';
+
+    const statusEl = document.getElementById('natStatus');
+    statusEl.textContent = statusText;
+    statusEl.className = `form-status-label ${statusClass}`;
+
+    // Link to national jacket preview page
+    const previewLink = document.getElementById('natPreviewLink');
+    if (order.id) {
+        previewLink.href = `national-jacket-preview.html?record_id=${order.id}`;
+        previewLink.style.display = 'inline-flex';
+    } else {
+        previewLink.style.display = 'none';
+    }
+
+    container.style.display = 'block';
 }
 
 function calculateTotalPrice() {

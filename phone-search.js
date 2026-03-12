@@ -614,6 +614,12 @@ function createMemberDetailsHTML(member) {
                     <div class="image-comment"><strong>تعليق البطانة:</strong> ${member.InnerlinningComment}</div>` : ''}
                 </div>
             </div>` : ''}
+
+            <div class="member-actions-section">
+                <button class="btn btn-success" onclick="downloadMemberPDF(${member.id})">
+                    <i class="fas fa-print"></i> الذهاب إلى صفحة الطباعة
+                </button>
+            </div>
         </div>`;
 }
 
@@ -654,3 +660,57 @@ function showNotification(message, type) {
     notification.className = `notification ${type} show`;
     setTimeout(() => notification.classList.remove('show'), 3000);
 }
+
+// ── PDF / Print helpers ─────────────────────────────────────────────
+
+function generateMemberDataId() {
+    return 'member_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+function storeMemberData(member) {
+    const dataId = generateMemberDataId();
+    try {
+        localStorage.setItem(dataId, JSON.stringify({ member, timestamp: Date.now() }));
+        return dataId;
+    } catch (error) {
+        console.error('Error storing member data:', error);
+        return null;
+    }
+}
+
+function cleanupOldMemberData() {
+    const oneHourAgo = Date.now() - (60 * 60 * 1000);
+    Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('member_')) {
+            try {
+                const data = JSON.parse(localStorage.getItem(key));
+                if (data.timestamp && data.timestamp < oneHourAgo) {
+                    localStorage.removeItem(key);
+                }
+            } catch (e) {
+                localStorage.removeItem(key);
+            }
+        }
+    });
+}
+
+function downloadMemberPDF(memberId) {
+    const member = currentMembers.find(m => m.id === memberId);
+    if (!member) {
+        showNotification('لم يتم العثور على العضو', 'error');
+        return;
+    }
+
+    cleanupOldMemberData();
+    const dataId = storeMemberData(member);
+
+    if (dataId) {
+        window.open(`member-pdf.html?dataId=${dataId}`, '_blank');
+    } else {
+        const memberData = encodeURIComponent(JSON.stringify(member));
+        window.open(`member-pdf.html?member=${memberData}`, '_blank');
+    }
+
+    showNotification('تم فتح صفحة PDF في تبويب جديد', 'success');
+}
+window.downloadMemberPDF = downloadMemberPDF;
